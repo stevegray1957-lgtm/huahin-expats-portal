@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Business Directory | HuaHin ExpatsPortal</title>
+  <meta name="description" content="The complete local business directory for expats in Hua Hin, Thailand. 260 listings across 19 categories including medical, restaurants, bars, golf clubs and more.">
+  <link rel="canonical" href="https://HuaHinExpatsPortal.com/directory.html">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/images/logo-huahin-expatsportal.png">
+  <style>
+    /* ── Directory-specific styles ── */
+    .dir-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+      align-items: start;
+    }
+
+    /* Sidebar */
+    .dir-sidebar {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(26,32,53,0.07);
+      overflow: hidden;
+      position: sticky;
+      top: 90px;
+    }
+    .sidebar-title {
+      background: #1A3F8F;
+      color: #fff;
+      padding: 14px 18px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cat-list { list-style: none; }
+    .cat-list li a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 18px;
+      color: #1A2035;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #f0f4f8;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .cat-list li a:hover,
+    .cat-list li a.active {
+      background: #EEF2FB;
+      color: #1A3F8F;
+      font-weight: 600;
+    }
+    .cat-list li a .cat-count {
+      background: #E8650A;
+      color: #fff;
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .cat-list li a.active .cat-count { background: #1A3F8F; }
+
+    /* Search bar */
+    .dir-search-bar {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .dir-search-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #dde3ee;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    .dir-search-input:focus { border-color: #1A3F8F; }
+
+    /* Results header */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .results-count {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      color: #666;
+    }
+    .results-count strong { color: #1A2035; }
+
+    /* Listing Cards */
+    .listing-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 22px;
+      box-shadow: 0 2px 8px rgba(26,32,53,0.06);
+      margin-bottom: 16px;
+      border-left: 4px solid #1A3F8F;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .listing-card:hover {
+      box-shadow: 0 6px 20px rgba(26,32,53,0.12);
+      transform: translateY(-1px);
+    }
+    .listing-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .listing-name {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #1A2035;
+      margin: 0;
+    }
+    .listing-category-tag {
+      background: #EEF2FB;
+      color: #1A3F8F;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .listing-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .listing-field {
+      display: flex;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: #444;
+      align-items: flex-start;
+    }
+    .listing-field .field-icon { flex-shrink: 0; font-size: 0.95rem; width: 20px; }
+    .listing-field .field-val { word-break: break-word; }
+    .listing-field .field-val a { color: #1A3F8F; }
+    .listing-field .field-val a:hover { color: #E8650A; }
+
+    /* Rating row */
+    .listing-rating-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+    .listing-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Reviews section */
+    .reviews-section {
+      margin-top: 16px;
+      border-top: 1px solid #f0f4f8;
+      padding-top: 14px;
+    }
+    .reviews-section h4 {
+      font-size: 0.88rem;
+      font-family: 'Poppins', sans-serif;
+      color: #555;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .review-item {
+      background: #F5F5F5;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+    }
+    .review-item .rev-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+    .review-item .rev-name {
+      font-weight: 700;
+      color: #1A2035;
+      font-size: 0.85rem;
+    }
+    .review-item .rev-date {
+      color: #aaa;
+      font-size: 0.78rem;
+    }
+    .review-item .rev-text { color: #444; line-height: 1.5; }
+    .no-reviews { color: #aaa; font-style: italic; font-size: 0.875rem; }
+    .show-more-reviews {
+      background: none;
+      border: 1px solid #dde3ee;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: #1A3F8F;
+      margin-top: 6px;
+    }
+    .show-more-reviews:hover { background: #EEF2FB; }
+
+    /* Loading / empty */
+    .loading-state, .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    .loading-state .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #dde3ee;
+      border-top-color: #1A3F8F;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+    @media (max-width: 900px) {
+      .dir-layout { grid-template-columns: 1fr; }
+      .dir-sidebar { position: static; }
+      .cat-list { display: flex; flex-wrap: wrap; gap: 4px; padding: 12px; }
+      .cat-list li a {
+        border: 1px solid #dde3ee;
+        border-radius: 8px;
+        padding: 6px 12px;
+        border-bottom: 1px solid #dde3ee;
+        font-size: 0.82rem;
+      }
+      .sidebar-title { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/"><img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="site-logo"></a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav" id="site-nav">
+      <a href="/">Home</a>
+      <a href="/moving.html">Moving Here</a>
+      <a href="/living.html">Living Here</a>
+      <a href="/directory.html" class="active">Directory</a>
+      <a href="/essentials.html">Expat Essentials</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html" class="nav-cta">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── Page Hero ─────────────────────────────────────────────── -->
+<div class="page-hero">
+  <div class="container">
+    <h1>🗂 Hua Hin Local Directory</h1>
+    <p>260 listings across 19 categories — restaurants, medical, legal, real estate, golf, bars and more.</p>
+  </div>
+</div>
+
+<!-- ── Directory Layout ───────────────────────────────────────── -->
+<div class="dir-layout">
+
+  <!-- Sidebar -->
+  <aside class="dir-sidebar">
+    <div class="sidebar-title">Browse Categories</div>
+    <ul class="cat-list" id="cat-list">
+      <li><a href="#" data-cat="" class="active">All Categories <span class="cat-count" id="total-count">260</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Main content -->
+  <main>
+    <!-- Search bar -->
+    <div class="dir-search-bar">
+      <input type="search" class="dir-search-input" id="search-input" placeholder="Search by name, area or keyword…" autocomplete="off">
+      <button class="btn btn-secondary" id="clear-search" style="display:none">Clear</button>
+    </div>
+
+    <!-- Results header -->
+    <div class="results-header">
+      <div class="results-count" id="results-count">Loading listings…</div>
+    </div>
+
+    <!-- Listings container -->
+    <div id="listings-container">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading directory…</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Footer ─────────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="site-logo">
+      <p>Your Complete Guide to Expat Life in Hua Hin, Thailand.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/moving.html">Moving Here</a></li>
+        <li><a href="/essentials.html">Expat Essentials</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 HuaHin ExpatsPortal · <a href="/privacy.html">Privacy</a></span>
+  </div>
+</footer>
+
+<!-- ── Admin Button ───────────────────────────────────────────── -->
+<button class="admin-btn-fixed" onclick="window.location='/admin.html'" title="Admin Panel">⚙️</button>
+
+<!-- ── Toast ──────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<!-- ── Review Modal ───────────────────────────────────────────── -->
+<div class="modal-overlay" id="review-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Write a Review</h3>
+      <button class="modal-close" onclick="closeModal('review-modal')">✕</button>
+    </div>
+    <form id="review-form">
+      <input type="hidden" id="rv-listing-id">
+      <input type="hidden" id="rv-listing-name">
+      <input type="hidden" id="rv-category">
+      <div class="form-group">
+        <label>Listing</label>
+        <input type="text" id="rv-listing-display" readonly style="background:#f5f5f5; color:#888;">
+      </div>
+      <div class="form-group">
+        <label for="rv-name">Your Name <span style="color:#CC1A1A">*</span></label>
+        <input type="text" id="rv-name" placeholder="e.g. John from the UK" required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>Rating <span style="color:#CC1A1A">*</span></label>
+        <div class="star-picker" id="star-picker">
+          <span data-val="1">★</span>
+          <span data-val="2">★</span>
+          <span data-val="3">★</span>
+          <span data-val="4">★</span>
+          <span data-val="5">★</span>
+        </div>
+        <input type="hidden" id="rv-rating" value="0">
+      </div>
+      <div class="form-group">
+        <label for="rv-text">Review <span style="color:#CC1A1A">*</span></label>
+        <textarea id="rv-text" placeholder="Share your experience (min 10 characters)…" required minlength="10" maxlength="1000"></textarea>
+        <div class="char-count"><span id="rv-char-count">0</span> / 1000</div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Submit Review</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Edit Suggestion Modal ───────────────────────────────────── -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Suggest an Edit</h3>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <p style="font-size:0.88rem; color:#666; margin-bottom:16px;">Spotted something outdated? Let us know and we'll update it.</p>
+    <form id="edit-form">
+      <input type="hidden" id="ed-listing-id">
+      <input type="hidden" id="ed-listing-name">
+      <div class="form-group">
+        <label>Listing</label>
+        <input type="text" id="ed-listing-display" readonly style="background:#f5f5f5; color:#888;">
+      </div>
+      <div class="form-group">
+        <label for="ed-name">Your Name (optional)</label>
+        <input type="text" id="ed-name" placeholder="Optional" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label for="ed-email">Your Email (optional)</label>
+        <input type="email" id="ed-email" placeholder="Optional — for follow-up only">
+      </div>
+      <div class="form-group">
+        <label for="ed-desc">What needs updating? <span style="color:#CC1A1A">*</span></label>
+        <textarea id="ed-desc" placeholder="e.g. Phone number has changed to 032 xxxxxx, or Business has closed." required minlength="5" maxlength="2000"></textarea>
+      </div>
+      <button type="submit" class="btn btn-secondary" style="width:100%">Submit Suggestion</button>
+    </form>
+  </div>
+</div>
+
+<script src="/js/directory.js"></script>
+</body>
+</html>

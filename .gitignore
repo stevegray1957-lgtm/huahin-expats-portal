@@ -1,0 +1,8 @@
+node_modules/
+.env
+data/portal.db
+data/portal.db-wal
+data/portal.db-shm
+*.log
+.DS_Store
+.vercel/

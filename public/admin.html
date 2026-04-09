@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | HuaHin ExpatsPortal</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/images/logo-huahin-expatsportal.png">
+  <style>
+    body { background: #F0F4F8; }
+
+    /* ── Login Screen ── */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #1A3F8F 0%, #0d2660 100%);
+    }
+    .login-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 36px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+    .login-box img { height: 70px; margin: 0 auto 20px; }
+    .login-box h2 { margin-bottom: 6px; }
+    .login-box p { color: #888; font-size: 0.88rem; margin-bottom: 24px; }
+    .login-error { color: #CC1A1A; font-size: 0.85rem; margin-top: 10px; display: none; }
+
+    /* ── Admin Shell ── */
+    .admin-shell { display: none; min-height: 100vh; }
+
+    .admin-header {
+      background: #1A2035;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .admin-header img { height: 44px; }
+    .admin-header-title {
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .admin-header-title span { color: #E8650A; }
+    .admin-header-right { display: flex; align-items: center; gap: 12px; }
+    .admin-user { color: rgba(255,255,255,0.65); font-size: 0.85rem; }
+
+    /* ── Tabs ── */
+    .admin-tabs {
+      background: #fff;
+      border-bottom: 2px solid #eee;
+      display: flex;
+      gap: 0;
+      padding: 0 24px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 16px 20px;
+      border: none;
+      background: none;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      top: 2px;
+    }
+    .tab-btn:hover { color: #1A3F8F; }
+    .tab-btn.active { color: #1A3F8F; border-bottom-color: #1A3F8F; }
+    .tab-badge {
+      background: #CC1A1A;
+      color: #fff;
+      border-radius: 10px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tab-badge.zero { background: #ccc; }
+
+    /* ── Admin Content ── */
+    .admin-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Admin Cards ── */
+    .admin-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(26,32,53,0.07);
+      border-left: 4px solid #1A3F8F;
+    }
+    .admin-card.pending { border-left-color: #F4B942; }
+    .admin-card.approved { border-left-color: #2ABFBF; }
+    .admin-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .admin-card-meta {
+      font-size: 0.82rem;
+      color: #888;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .admin-card-meta strong { color: #1A2035; }
+    .admin-card-body {
+      background: #F5F5F5;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      color: #333;
+      margin-bottom: 14px;
+      line-height: 1.55;
+    }
+    .admin-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ip-tag {
+      font-family: monospace;
+      font-size: 0.78rem;
+      background: #f0f4f8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #666;
+    }
+
+    /* ── Stars display ── */
+    .admin-stars { color: #F4B942; font-size: 1rem; letter-spacing: 1px; }
+
+    /* ── Search bar ── */
+    .admin-search {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .admin-search input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #dde3ee;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .admin-search input:focus { border-color: #1A3F8F; }
+
+    /* ── Empty state ── */
+    .admin-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: #aaa;
+    }
+    .admin-empty .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    /* ── Stat cards ── */
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(26,32,53,0.07);
+      text-align: center;
+    }
+    .stat-card .num {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      color: #1A3F8F;
+      display: block;
+    }
+    .stat-card .lbl { font-size: 0.82rem; color: #888; }
+
+    @media (max-width: 600px) {
+      .admin-header { flex-wrap: wrap; }
+      .admin-card-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Login Screen ───────────────────────────────────────────── -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal">
+    <h2>Admin Panel</h2>
+    <p>Enter your admin password to access the moderation dashboard.</p>
+    <form id="login-form">
+      <div class="form-group">
+        <input type="password" id="admin-password" placeholder="Admin password" required autocomplete="current-password" style="text-align:center; font-size:1rem; letter-spacing:2px;">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Sign In →</button>
+      <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+    </form>
+    <p style="margin-top:20px; font-size:0.78rem; color:#ccc;">
+      <a href="/">← Back to site</a>
+    </p>
+  </div>
+</div>
+
+<!-- ── Admin Shell ────────────────────────────────────────────── -->
+<div class="admin-shell" id="admin-shell">
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal">
+      <div class="admin-header-title"><span>HuaHin</span> ExpatsPortal — Admin</div>
+    </div>
+    <div class="admin-header-right">
+      <span class="admin-user">Logged in as Steve</span>
+      <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.7);" onclick="logout()">Sign Out</button>
+      <a href="/" class="btn btn-sm" style="background:#E8650A; color:#fff;">View Site →</a>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('pending-reviews')" id="tab-pending-reviews">
+      ⏳ Pending Reviews <span class="tab-badge" id="badge-pending-reviews">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('pending-edits')" id="tab-pending-edits">
+      ✏️ Pending Edits <span class="tab-badge" id="badge-pending-edits">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('published-reviews')" id="tab-published-reviews">
+      ✅ Published Reviews
+    </button>
+  </nav>
+
+  <!-- Content -->
+  <div class="admin-content">
+
+    <!-- ── Tab 1: Pending Reviews ── -->
+    <div class="tab-panel active" id="panel-pending-reviews">
+      <div class="admin-stats" id="stats-row">
+        <div class="stat-card"><span class="num" id="stat-pending">–</span><span class="lbl">Pending Reviews</span></div>
+        <div class="stat-card"><span class="num" id="stat-published">–</span><span class="lbl">Published Reviews</span></div>
+        <div class="stat-card"><span class="num" id="stat-edits">–</span><span class="lbl">Pending Edits</span></div>
+        <div class="stat-card"><span class="num" id="stat-listings">260</span><span class="lbl">Directory Listings</span></div>
+      </div>
+      <div id="pending-reviews-list">
+        <div class="admin-empty"><div class="icon">⏳</div><p>Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 2: Pending Edits ── -->
+    <div class="tab-panel" id="panel-pending-edits">
+      <div id="pending-edits-list">
+        <div class="admin-empty"><div class="icon">⏳</div><p>Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 3: Published Reviews ── -->
+    <div class="tab-panel" id="panel-published-reviews">
+      <div class="admin-search">
+        <input type="search" id="pub-search" placeholder="Search by listing name or category…">
+        <button class="btn btn-secondary btn-sm" onclick="loadPublishedReviews()">Search</button>
+      </div>
+      <div id="published-reviews-list">
+        <div class="admin-empty"><div class="icon">⏳</div><p>Loading…</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>
