@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expat Blog — Hua Hin Life, Tips &amp; Guides | HuaHin ExpatsPortal</title>
+  <meta name="description" content="Practical guides and articles for expats living in Hua Hin, Thailand. Visa guides, cost of living, healthcare, banking and more.">
+  <meta name="keywords" content="hua hin expat blog, thailand expat guide, living in hua hin, hua hin retirement, thailand visa guide">
+  <meta property="og:title" content="Expat Blog — Hua Hin Life, Tips &amp; Guides | HuaHin ExpatsPortal">
+  <meta property="og:description" content="Practical guides and articles for expats living in Hua Hin, Thailand. Visa guides, cost of living, healthcare, banking and more.">
+  <meta property="og:image" content="/images/logo-huahin-expatsportal.png">
+  <meta property="og:url" content="https://HuaHinExpatsPortal.com/blog.html">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://HuaHinExpatsPortal.com/blog.html">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/images/logo-huahin-expatsportal.png">
+  <style>
+    /* ── Blog Listing Page Styles ─────────────────────────────── */
+
+    /* Hero */
+    .blog-hero {
+      background: linear-gradient(135deg, #1A3F8F 0%, #0d2660 60%, #1a2035 100%);
+      color: #fff;
+      padding: 64px 20px 52px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232ABFBF' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+    .blog-hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .blog-hero h1 {
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .blog-hero h1 span { color: #E8650A; }
+    .blog-hero p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.82);
+      margin: 0;
+    }
+    .blog-hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+    .blog-hero-stats .stat {
+      text-align: center;
+    }
+    .blog-hero-stats .stat strong {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #E8650A;
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .blog-hero-stats .stat span {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.65);
+    }
+
+    /* Category Filter Bar */
+    .category-filter {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 0 20px;
+      position: sticky;
+      top: 91px; /* below header */
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(26,32,53,0.06);
+    }
+    .category-filter-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 12px 0;
+    }
+    .category-filter-inner::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      background: #F5F5F5;
+      color: #555;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.18s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .filter-btn:hover {
+      background: #EEF2FB;
+      border-color: #1A3F8F;
+      color: #1A3F8F;
+    }
+    .filter-btn.active {
+      background: #1A3F8F;
+      border-color: #1A3F8F;
+      color: #fff;
+    }
+
+    /* Blog Listing Grid */
+    .blog-listing-section {
+      padding: 52px 0 60px;
+    }
+    .blog-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 28px;
+      margin-top: 36px;
+    }
+    .blog-card-full {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(26,32,53,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #eee;
+    }
+    .blog-card-full:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 32px rgba(26,63,143,0.14);
+    }
+    .blog-card-visual {
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.4rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+    /* Category colour bands */
+    .blog-card-visual.visas    { background: linear-gradient(135deg, #1A3F8F 0%, #2a5fcc 100%); }
+    .blog-card-visual.col      { background: linear-gradient(135deg, #1a7a3f 0%, #27ae60 100%); }
+    .blog-card-visual.health   { background: linear-gradient(135deg, #127a7a 0%, #2ABFBF 100%); }
+    .blog-card-visual.money    { background: linear-gradient(135deg, #b34800 0%, #E8650A 100%); }
+    .blog-card-visual.tech     { background: linear-gradient(135deg, #5b1a8f 0%, #8e44ad 100%); }
+    .blog-card-full-body {
+      padding: 22px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .cat-badge {
+      display: inline-block;
+      padding: 4px 11px;
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      align-self: flex-start;
+    }
+    .cat-badge.visas  { background: #EEF2FB; color: #1A3F8F; }
+    .cat-badge.col    { background: #E6F5EC; color: #1a7a3f; }
+    .cat-badge.health { background: #E0F5F5; color: #127a7a; }
+    .cat-badge.money  { background: #FFF0E6; color: #b34800; }
+    .cat-badge.tech   { background: #F3EBF9; color: #5b1a8f; }
+    .blog-card-full-body h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+    .blog-card-full-body h2 a {
+      color: #1A2035;
+      text-decoration: none;
+    }
+    .blog-card-full-body h2 a:hover { color: #1A3F8F; }
+    .blog-card-full-body .excerpt {
+      color: #666;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+    .blog-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .read-time {
+      font-size: 0.8rem;
+      color: #999;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .read-time svg {
+      flex-shrink: 0;
+    }
+    .read-more-link {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #1A3F8F;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.15s, color 0.15s;
+    }
+    .read-more-link:hover {
+      color: #E8650A;
+      gap: 8px;
+    }
+
+    /* Coming Soon Section */
+    .coming-soon-section {
+      padding: 0 0 60px;
+    }
+    .coming-soon-heading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .coming-soon-heading h2 { font-size: 1.35rem; }
+    .coming-soon-tag {
+      background: #FFF0E6;
+      color: #E8650A;
+      border: 1px solid #fad5b8;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .coming-soon-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .coming-soon-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px dashed #dde3ee;
+      opacity: 0.72;
+      transition: opacity 0.2s, border-color 0.2s;
+    }
+    .coming-soon-card:hover {
+      opacity: 0.9;
+      border-color: #aabce0;
+    }
+    .coming-soon-visual {
+      height: 90px;
+      background: linear-gradient(135deg, #dde3ee 0%, #c8d2e8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      filter: grayscale(0.4);
+    }
+    .coming-soon-body {
+      padding: 18px 20px;
+    }
+    .coming-soon-body .cs-badge {
+      display: inline-block;
+      background: #F5F5F5;
+      color: #999;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 10px;
+    }
+    .coming-soon-body h3 {
+      font-size: 0.97rem;
+      color: #888;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+    .coming-soon-body .cs-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: #aaa;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+    }
+    .cs-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #E8650A;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    /* Newsletter CTA */
+    .newsletter-section {
+      background: linear-gradient(135deg, #1A3F8F 0%, #0d2660 100%);
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .newsletter-section h2 { color: #fff; margin-bottom: 12px; }
+    .newsletter-section .lead {
+      color: rgba(255,255,255,0.78);
+      font-size: 1.02rem;
+      max-width: 500px;
+      margin: 0 auto 28px;
+    }
+    .newsletter-section .form-note {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
+    }
+
+    /* Divider rule between sections */
+    .section-rule {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      .blog-cards { grid-template-columns: 1fr; }
+      .coming-soon-cards { grid-template-columns: 1fr; }
+      .category-filter { top: 77px; }
+      .coming-soon-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+    @media (max-width: 420px) {
+      .blog-hero { padding: 48px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/">
+      <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="site-logo">
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav" id="site-nav">
+      <a href="/">Home</a>
+      <a href="/moving.html">Moving Here</a>
+      <a href="/living.html">Living Here</a>
+      <a href="/directory.html">Directory</a>
+      <a href="/essentials.html">Expat Essentials</a>
+      <a href="/blog.html" class="active">Blog</a>
+      <a href="/contact.html" class="nav-cta">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── Breadcrumb ─────────────────────────────────────────────── -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="/">Home</a>
+    <span>&rsaquo;</span>
+    Blog
+  </div>
+</div>
+
+<!-- ── Blog Hero ──────────────────────────────────────────────── -->
+<section class="blog-hero">
+  <div class="blog-hero-content">
+    <span class="hero-badge">✍️ Expert Guides for Expats</span>
+    <h1>Expat <span>Blog</span></h1>
+    <p>Practical guides for life in Hua Hin, Thailand — written by people who actually live here.</p>
+    <div class="blog-hero-stats">
+      <div class="stat">
+        <strong>5</strong>
+        <span>Published Articles</span>
+      </div>
+      <div class="stat">
+        <strong>5</strong>
+        <span>Topics Covered</span>
+      </div>
+      <div class="stat">
+        <strong>Free</strong>
+        <span>Always</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Category Filter Bar ────────────────────────────────────── -->
+<nav class="category-filter" aria-label="Filter articles by category">
+  <div class="category-filter-inner">
+    <a href="#articles" class="filter-btn active">All</a>
+    <a href="#articles" class="filter-btn">Visas &amp; Legal</a>
+    <a href="#articles" class="filter-btn">Cost of Living</a>
+    <a href="#articles" class="filter-btn">Healthcare</a>
+    <a href="#articles" class="filter-btn">Money</a>
+    <a href="#articles" class="filter-btn">Tech &amp; Tools</a>
+  </div>
+</nav>
+
+<!-- ── Article Grid ───────────────────────────────────────────── -->
+<section class="blog-listing-section" id="articles">
+  <div class="container">
+    <div class="section-heading">
+      <span class="overline">All Articles</span>
+      <h2>Latest Guides &amp; Tips</h2>
+      <p>Everything you need to know about living well as an expat in Hua Hin, Thailand.</p>
+    </div>
+
+    <div class="blog-cards">
+
+      <!-- Article 1: Retirement Visa -->
+      <article class="blog-card-full">
+        <div class="blog-card-visual visas" aria-hidden="true">🛂</div>
+        <div class="blog-card-full-body">
+          <span class="cat-badge visas">Visas &amp; Legal</span>
+          <h2><a href="/blog/thailand-retirement-visa-hua-hin.html">The Complete Guide to Thailand Retirement Visa in Hua Hin</a></h2>
+          <p class="excerpt">Everything you need to know about getting a Non-OA (Retirement) Visa in Hua Hin, including the 800k THB requirement and renewal process.</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              12 min read
+            </span>
+            <a href="/blog/thailand-retirement-visa-hua-hin.html" class="read-more-link">Read Article &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Article 2: Cost of Living -->
+      <article class="blog-card-full">
+        <div class="blog-card-visual col" aria-hidden="true">💰</div>
+        <div class="blog-card-full-body">
+          <span class="cat-badge col">Cost of Living</span>
+          <h2><a href="/blog/cost-of-living-hua-hin-2026.html">Cost of Living in Hua Hin 2026: The Real Numbers</a></h2>
+          <p class="excerpt">Real monthly budgets from ฿25,000 to ฿85,000+ — rent, food, transport, healthcare and entertainment broken down.</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              10 min read
+            </span>
+            <a href="/blog/cost-of-living-hua-hin-2026.html" class="read-more-link">Read Article &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Article 3: Health Insurance -->
+      <article class="blog-card-full">
+        <div class="blog-card-visual health" aria-hidden="true">🏥</div>
+        <div class="blog-card-full-body">
+          <span class="cat-badge health">Healthcare</span>
+          <h2><a href="/blog/health-insurance-hua-hin.html">Health Insurance for Expats in Hua Hin: What You Need to Know</a></h2>
+          <p class="excerpt">Comparing international health insurance plans for expats in Hua Hin, from Bangkok Hospital to Pacific Prime and AIA.</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              8 min read
+            </span>
+            <a href="/blog/health-insurance-hua-hin.html" class="read-more-link">Read Article &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Article 4: Money Transfer -->
+      <article class="blog-card-full">
+        <div class="blog-card-visual money" aria-hidden="true">💸</div>
+        <div class="blog-card-full-body">
+          <span class="cat-badge money">Money</span>
+          <h2><a href="/blog/money-transfer-thailand.html">Best Ways to Transfer Money to Thailand as an Expat</a></h2>
+          <p class="excerpt">Wise vs bank transfer vs Western Union — which is cheapest and fastest for sending money to your Thai bank account?</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              7 min read
+            </span>
+            <a href="/blog/money-transfer-thailand.html" class="read-more-link">Read Article &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Article 5: VPN -->
+      <article class="blog-card-full">
+        <div class="blog-card-visual tech" aria-hidden="true">🔒</div>
+        <div class="blog-card-full-body">
+          <span class="cat-badge tech">Tech &amp; Tools</span>
+          <h2><a href="/blog/vpn-thailand-expats.html">Why Every Expat in Thailand Needs a VPN</a></h2>
+          <p class="excerpt">Why you need a VPN in Thailand, which services work best, and how to keep accessing your home country content.</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <a href="/blog/vpn-thailand-expats.html" class="read-more-link">Read Article &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- ── Coming Soon ────────────────────────────────────────────── -->
+<section class="coming-soon-section">
+  <div class="container">
+    <div class="coming-soon-heading">
+      <h2>More Articles Coming Soon</h2>
+      <span class="coming-soon-tag">In Progress</span>
+    </div>
+    <p style="color:#666; font-size:0.92rem; margin-bottom:28px; max-width:560px;">We're working on more practical guides for the Hua Hin expat community. Here's a preview of what's next.</p>
+
+    <div class="coming-soon-cards">
+
+      <!-- Placeholder 1 -->
+      <article class="coming-soon-card">
+        <div class="coming-soon-visual" aria-hidden="true">🏠</div>
+        <div class="coming-soon-body">
+          <span class="cs-badge">Real Estate</span>
+          <h3>Finding the Perfect Rental in Hua Hin</h3>
+          <span class="cs-label">
+            <span class="cs-dot"></span>
+            Coming soon
+          </span>
+        </div>
+      </article>
+
+      <!-- Placeholder 2 -->
+      <article class="coming-soon-card">
+        <div class="coming-soon-visual" aria-hidden="true">🏦</div>
+        <div class="coming-soon-body">
+          <span class="cs-badge">Banking</span>
+          <h3>Opening a Thai Bank Account as a Foreigner</h3>
+          <span class="cs-label">
+            <span class="cs-dot"></span>
+            Coming soon
+          </span>
+        </div>
+      </article>
+
+      <!-- Placeholder 3 -->
+      <article class="coming-soon-card">
+        <div class="coming-soon-visual" aria-hidden="true">🍽️</div>
+        <div class="coming-soon-body">
+          <span class="cs-badge">Food &amp; Dining</span>
+          <h3>The Best Restaurants in Hua Hin for Expats</h3>
+          <span class="cs-label">
+            <span class="cs-dot"></span>
+            Coming soon
+          </span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Newsletter CTA ─────────────────────────────────────────── -->
+<section class="newsletter-section">
+  <div class="container">
+    <h2>Get New Articles in Your Inbox</h2>
+    <p class="lead">Be the first to know when we publish a new guide. No spam — just practical expat content, straight to your inbox.</p>
+    <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
+      <input type="email" placeholder="Your email address" required aria-label="Email address">
+      <button type="submit" class="btn btn-primary">Subscribe Free</button>
+    </form>
+    <p class="form-note">Join the Hua Hin expat community. Unsubscribe any time.</p>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="site-logo">
+      <p>Your Complete Guide to Expat Life in Hua Hin, Thailand. Trusted, practical and community-driven.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Moving Here</h4>
+      <ul>
+        <li><a href="/moving.html#visa">Visa &amp; Immigration</a></li>
+        <li><a href="/moving.html#cost">Cost of Living</a></li>
+        <li><a href="/moving.html#accommodation">Accommodation</a></li>
+        <li><a href="/moving.html#healthcare">Healthcare</a></li>
+        <li><a href="/moving.html#banking">Banking &amp; Money</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Directory</h4>
+      <ul>
+        <li><a href="/directory.html?cat=medical-dental">Medical &amp; Dental</a></li>
+        <li><a href="/directory.html?cat=restaurants-dining">Restaurants</a></li>
+        <li><a href="/directory.html?cat=bars-cafes">Bars &amp; Cafes</a></li>
+        <li><a href="/directory.html?cat=golf-clubs">Golf Clubs</a></li>
+        <li><a href="/directory.html">All Categories &rarr;</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Blog</h4>
+      <ul>
+        <li><a href="/blog/thailand-retirement-visa-hua-hin.html">Retirement Visa Guide</a></li>
+        <li><a href="/blog/cost-of-living-hua-hin-2026.html">Cost of Living 2026</a></li>
+        <li><a href="/blog/health-insurance-hua-hin.html">Health Insurance</a></li>
+        <li><a href="/blog/money-transfer-thailand.html">Money Transfers</a></li>
+        <li><a href="/blog/vpn-thailand-expats.html">VPN Guide</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 HuaHin ExpatsPortal &middot; <a href="/privacy.html">Privacy Policy</a> &middot; <a href="/sitemap.xml">Sitemap</a></span>
+    <span>Built for the Hua Hin expat community 🌏</span>
+  </div>
+</footer>
+
+<!-- ── Toast ──────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // Hamburger menu
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('site-nav').classList.toggle('open');
+  });
+
+  // Category filter active state
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Newsletter signup
+  function handleNewsletterSignup(e) {
+    e.preventDefault();
+    showToast('Thanks for subscribing! We\'ll be in touch soon.', 'success');
+    e.target.reset();
+  }
+
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+</script>
+
+</body>
+</html>

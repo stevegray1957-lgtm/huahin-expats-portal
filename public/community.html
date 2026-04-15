@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expat Community in Hua Hin — Groups, Events & Forums | HuaHin ExpatsPortal</title>
+  <meta name="description" content="Connect with the Hua Hin expat community. Facebook groups, social clubs, events calendar and expat stories from people who made the move.">
+  <link rel="canonical" href="https://HuaHinExpatsPortal.com/community.html">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/images/logo-huahin-expatsportal.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #1A3F8F 0%, #2ABFBF 100%);
+      color: #fff;
+      padding: 90px 20px 60px;
+      text-align: center;
+    }
+    .page-hero h1 { font-size: 2.8rem; margin-bottom: 16px; }
+    .page-hero p { font-size: 1.15rem; opacity: 0.85; max-width: 680px; margin: 0 auto; }
+    .community-section {
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+    .community-section h2 {
+      font-size: 2rem;
+      color: #1A2035;
+      margin-bottom: 10px;
+    }
+    .section-lead { font-size: 1.05rem; color: #555; margin-bottom: 32px; line-height: 1.7; }
+    .group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+    .group-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      transition: transform 0.2s;
+    }
+    .group-card:hover { transform: translateY(-3px); }
+    .group-icon { font-size: 2.4rem; margin-bottom: 14px; display: block; }
+    .group-card h3 { font-size: 1.08rem; color: #1A2035; margin-bottom: 8px; }
+    .group-card p { font-size: 0.92rem; color: #555; line-height: 1.65; margin-bottom: 14px; }
+    .group-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.84rem;
+    }
+    .group-members { color: #888; }
+    .group-link {
+      color: #E8650A;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .group-link:hover { text-decoration: underline; }
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
+      margin-bottom: 50px;
+    }
+    .story-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px 26px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      border-top: 4px solid #2ABFBF;
+    }
+    .story-quote {
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.7;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    .story-author {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .story-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #E8650A, #1A3F8F);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .story-info strong { display: block; color: #1A2035; font-size: 0.95rem; }
+    .story-info span { color: #888; font-size: 0.84rem; }
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 50px;
+    }
+    .event-item {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .event-date {
+      background: #E8650A;
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 14px;
+      text-align: center;
+      min-width: 60px;
+      flex-shrink: 0;
+    }
+    .event-date .month { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .event-date .day { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+    .event-info h3 { font-size: 1rem; color: #1A2035; margin-bottom: 4px; }
+    .event-info p { font-size: 0.88rem; color: #666; margin: 0; }
+    .event-tag {
+      margin-left: auto;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .tag-social { background: #dbeafe; color: #1e40af; }
+    .tag-sport { background: #d1fae5; color: #065f46; }
+    .tag-culture { background: #fce7f3; color: #9d174d; }
+    .tag-market { background: #fff7ed; color: #c2410c; }
+    .join-cta {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 50px 40px;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .join-cta h2 { font-size: 1.9rem; color: #1A2035; margin-bottom: 14px; }
+    .join-cta p { color: #555; font-size: 1.05rem; margin-bottom: 28px; max-width: 560px; margin-left: auto; margin-right: auto; }
+    @media (max-width: 700px) {
+      .page-hero h1 { font-size: 2rem; }
+      .event-item { flex-direction: column; align-items: flex-start; }
+      .event-tag { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/"><img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="site-logo"></a>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <nav class="site-nav" id="site-nav">
+      <a href="/">Home</a>
+      <a href="/moving.html">Moving Here</a>
+      <a href="/living.html">Living Here</a>
+      <a href="/directory.html">Directory</a>
+      <a href="/essentials.html">Expat Essentials</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html" class="nav-cta">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <span class="hero-badge">🤝 15,000+ Expats Strong</span>
+  <h1>The Hua Hin Expat Community</h1>
+  <p>Connect with expats from 30+ countries who call Hua Hin home. Facebook groups, social clubs, regular events and real stories from people who made the move.</p>
+</section>
+
+<!-- FACEBOOK GROUPS -->
+<section class="community-section">
+  <h2>📱 Online Communities &amp; Facebook Groups</h2>
+  <p class="section-lead">Facebook groups are the lifeblood of Hua Hin's expat community — where locals share tips, sell furniture, find doctors and organise meetups.</p>
+
+  <div class="group-grid">
+    <div class="group-card">
+      <span class="group-icon">👥</span>
+      <h3>Expats in Hua Hin</h3>
+      <p>The largest and most active English-language expat group for Hua Hin. General discussions, local recommendations, buying &amp; selling, and event announcements.</p>
+      <div class="group-meta">
+        <span class="group-members">~18,000 members</span>
+        <a href="https://www.facebook.com/groups/expatshuahin" target="_blank" rel="noopener" class="group-link">Join Group →</a>
+      </div>
+    </div>
+
+    <div class="group-card">
+      <span class="group-icon">🏡</span>
+      <h3>Hua Hin Expats &amp; Residents</h3>
+      <p>Friendly group focused on daily life, housing, and local services. Great for newcomers with questions about settling in.</p>
+      <div class="group-meta">
+        <span class="group-members">~9,500 members</span>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" class="group-link">Join Group →</a>
+      </div>
+    </div>
+
+    <div class="group-card">
+      <span class="group-icon">🏠</span>
+      <h3>Hua Hin Property &amp; Rentals</h3>
+      <p>Buy, sell and rent property in Hua Hin. Direct listings from owners and agents. Updated daily with new listings.</p>
+      <div class="group-meta">
+        <span class="group-members">~12,000 members</span>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" class="group-link">Join Group →</a>
+      </div>
+    </div>
+
+    <div class="group-card">
+      <span class="group-icon">🍽️</span>
+      <h3>Hua Hin Foodies</h3>
+      <p>Restaurant reviews, new openings, favourite local spots and food delivery tips. Great for discovering the best eats in town.</p>
+      <div class="group-meta">
+        <span class="group-members">~7,200 members</span>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" class="group-link">Join Group →</a>
+      </div>
+    </div>
+
+    <div class="group-card">
+      <span class="group-icon">⛳</span>
+      <h3>Hua Hin Golf Society</h3>
+      <p>Regular golf games at Hua Hin's excellent courses. Open to all skill levels. Great social scene and a top way to meet long-term expats quickly.</p>
+      <div class="group-meta">
+        <span class="group-members">~3,400 members</span>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" class="group-link">Join Group →</a>
+      </div>
+    </div>
+
+    <div class="group-card">
+      <span class="group-icon">👩‍👧</span>
+      <h3>Expat Mums in Hua Hin</h3>
+      <p>Support network for expat parents in Hua Hin. School recommendations, playgroups, family events and parenting advice.</p>
+      <div class="group-meta">
+        <span class="group-members">~2,800 members</span>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" class="group-link">Join Group →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="community-section">
+  <h2>📅 Regular Expat Events</h2>
+  <p class="section-lead">Hua Hin has something happening every week. Here are the regular events that expats love most.</p>
+
+  <div class="events-list">
+    <div class="event-item">
+      <div class="event-date"><div class="month">Mon</div><div class="day">WK</div></div>
+      <div class="event-info">
+        <h3>Hash House Harriers — Weekly Run/Walk</h3>
+        <p>Every Monday. Different location each week. 1–2 hour run or walk through Hua Hin's countryside, followed by social drinks. All fitness levels welcome.</p>
+      </div>
+      <span class="event-tag tag-sport">Sport &amp; Social</span>
+    </div>
+
+    <div class="event-item">
+      <div class="event-date"><div class="month">Thu</div><div class="day">WK</div></div>
+      <div class="event-info">
+        <h3>Quiz Nights — Various Venues</h3>
+        <p>Multiple bars run quiz nights on Thursdays. Entry usually free or small fee. Teams of 2–6 people. Great for meeting new people. Check Expats in Hua Hin Facebook for this week's venue.</p>
+      </div>
+      <span class="event-tag tag-social">Social</span>
+    </div>
+
+    <div class="event-item">
+      <div class="event-date"><div class="month">Sat</div><div class="day">WK</div></div>
+      <div class="event-info">
+        <h3>Weekend Market — Soi 72</h3>
+        <p>Every Saturday and Sunday morning. Huge local market with fresh produce, street food and household goods. Great for exploring local culture and meeting Thai neighbours.</p>
+      </div>
+      <span class="event-tag tag-market">Market</span>
+    </div>
+
+    <div class="event-item">
+      <div class="event-date"><div class="month">Sat</div><div class="day">WK</div></div>
+      <div class="event-info">
+        <h3>Cicada Night Market — Khao Takiab</h3>
+        <p>Friday and Saturday evenings near Khao Takiab. Art, crafts, live music, street food. One of Thailand's most atmospheric night markets. Very popular with expats.</p>
+      </div>
+      <span class="event-tag tag-culture">Culture</span>
+    </div>
+
+    <div class="event-item">
+      <div class="event-date"><div class="month">Jan</div><div class="day">ANN</div></div>
+      <div class="event-info">
+        <h3>Hua Hin Music Festival</h3>
+        <p>Annual free music festival at Khao Takiab beach. Usually January or February. Multiple stages, Thai and international acts. The social event of the expat year.</p>
+      </div>
+      <span class="event-tag tag-culture">Culture</span>
+    </div>
+
+    <div class="event-item">
+      <div class="event-date"><div class="month">Jun</div><div class="day">ANN</div></div>
+      <div class="event-info">
+        <h3>Hua Hin Jazz Festival</h3>
+        <p>Annual jazz festival on the beach in June. Free entry. World-class jazz acts and a fantastic atmosphere. One of Thailand's best music events.</p>
+      </div>
+      <span class="event-tag tag-culture">Culture</span>
+    </div>
+  </div>
+</section>
+
+<!-- EXPAT STORIES -->
+<section class="community-section">
+  <h2>💬 Expat Stories</h2>
+  <p class="section-lead">Real stories from people who moved to Hua Hin. Their honest experiences of the move, daily life and what they wish they'd known.</p>
+
+  <div class="story-grid">
+    <div class="story-card">
+      <p class="story-quote">"I retired here from Scotland 4 years ago and I've never looked back. The weather, the cost of living, the friendliness of Thai people — it's everything they say it is. Golf 4 times a week and a beer in the evening. Perfect."</p>
+      <div class="story-author">
+        <div class="story-avatar">GR</div>
+        <div class="story-info">
+          <strong>Graham R.</strong>
+          <span>Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿 | Retired since 2022</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <p class="story-quote">"We moved here with two kids for my husband's work-from-home job. The international school is brilliant and my kids have adapted amazingly well. The expat community welcomed us immediately."</p>
+      <div class="story-author">
+        <div class="story-avatar">SL</div>
+        <div class="story-info">
+          <strong>Sarah L.</strong>
+          <span>Australia 🇦🇺 | Living here since 2023</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <p class="story-quote">"The healthcare surprised me. Bangkok Hospital here is genuinely excellent — better than what I had in the Netherlands. The cost is a fraction of what I expected. I have insurance but rarely need it."</p>
+      <div class="story-author">
+        <div class="story-avatar">PM</div>
+        <div class="story-info">
+          <strong>Pieter M.</strong>
+          <span>Netherlands 🇳🇱 | Retired since 2021</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="join-cta">
+    <h2>Share Your Story</h2>
+    <p>Are you an expat living in Hua Hin? We'd love to feature your experience on this page. Help others who are considering the move.</p>
+    <a href="/contact.html" class="btn btn-primary">Get in Touch</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="footer-logo">
+      <p>Your complete guide to expat life in Hua Hin, Thailand.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Navigate</h4>
+      <a href="/">Home</a>
+      <a href="/moving.html">Moving Here</a>
+      <a href="/living.html">Living Here</a>
+      <a href="/directory.html">Directory</a>
+      <a href="/essentials.html">Expat Essentials</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Community</h4>
+      <a href="#groups">Facebook Groups</a>
+      <a href="#events">Events Calendar</a>
+      <a href="#stories">Expat Stories</a>
+    </div>
+    <div class="footer-links">
+      <h4>Directory</h4>
+      <a href="/directory.html?category=medical-dental">Medical Directory</a>
+      <a href="/directory.html?category=legal-visa">Visa Services</a>
+      <a href="/directory.html?category=real-estate">Real Estate</a>
+      <a href="/directory.html?category=restaurants">Restaurants</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 HuaHin ExpatsPortal. All rights reserved. | <a href="/contact.html">Contact Us</a></p>
+  </div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('site-nav');
+  hamburger.addEventListener('click', () => { nav.classList.toggle('open'); hamburger.classList.toggle('open'); });
+</script>
+</body>
+</html>

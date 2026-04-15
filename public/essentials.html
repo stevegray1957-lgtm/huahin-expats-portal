@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expat Essentials — Tools &amp; Services for Hua Hin Expats | HuaHin ExpatsPortal</title>
+  <meta name="description" content="Handpicked tools, services and resources for expats living in Hua Hin, Thailand. Save money on transfers, find health insurance, stay secure online and more.">
+  <link rel="canonical" href="https://HuaHinExpatsPortal.com/essentials.html">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/images/logo-huahin-expatsportal.png">
+  <!-- Google Analytics 4 — replace G-XXXXXXXXXX with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  <style>
+    /* ── Essentials page styles ── */
+    .essentials-intro {
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 56px 20px 16px;
+    }
+    .essentials-intro h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: #1A3F8F;
+      margin-bottom: 12px;
+    }
+    .essentials-intro p {
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.75;
+      margin-bottom: 0;
+    }
+
+    /* ── Disclaimer ── */
+    .disclaimer-bar {
+      max-width: 1100px;
+      margin: 24px auto 0;
+      padding: 0 20px;
+    }
+    .disclaimer-bar p {
+      font-size: 0.78rem;
+      color: #999;
+      background: #f8f8f8;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 10px 16px;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .disclaimer-bar p a {
+      color: #1A3F8F;
+    }
+
+    /* ── Cards grid ── */
+    .affiliate-cards-section {
+      padding: 32px 0 64px;
+    }
+    .affiliate-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Extended affiliate-card styles for this page */
+    .affiliate-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .affiliate-card .card-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+    .affiliate-card .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .icon-wise   { background: #9FE870; }
+    .icon-pp     { background: #E3F3FF; }
+    .icon-vpn    { background: #E6E0FF; }
+    .icon-agoda  { background: #FFF0E0; }
+    .icon-sky    { background: #E0F0FF; }
+    .icon-lazada { background: #FFE8F5; }
+
+    .affiliate-card .card-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1A2035;
+      margin: 0;
+    }
+    .affiliate-card .card-category {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #E8650A;
+    }
+    .affiliate-card .card-desc {
+      color: #444;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      margin: 10px 0 12px;
+      flex: 1;
+    }
+    .affiliate-card .card-benefits {
+      list-style: none;
+      margin: 0 0 18px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .affiliate-card .card-benefits li {
+      font-size: 0.85rem;
+      color: #333;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      line-height: 1.4;
+    }
+    .affiliate-card .card-benefits li::before {
+      content: '✓';
+      color: #2ABFBF;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .affiliate-card .card-cta {
+      margin-top: auto;
+    }
+    .affiliate-card .card-cta .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* ── Why We Recommend section ── */
+    .why-section {
+      background: #EEF2FB;
+      padding: 56px 20px;
+    }
+    .why-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .why-inner h2 {
+      color: #1A3F8F;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .why-inner .lead {
+      text-align: center;
+      color: #555;
+      font-size: 0.97rem;
+      line-height: 1.75;
+      margin-bottom: 36px;
+    }
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .why-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px 20px;
+      box-shadow: 0 2px 8px rgba(26,32,53,0.06);
+    }
+    .why-card .why-icon {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .why-card h3 {
+      font-size: 0.98rem;
+      color: #1A2035;
+      margin-bottom: 6px;
+    }
+    .why-card p {
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+      .affiliate-cards { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/"><img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="site-logo"></a>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <nav class="site-nav" id="site-nav">
+      <a href="/">Home</a>
+      <a href="/moving.html">Moving Here</a>
+      <a href="/living.html">Living Here</a>
+      <a href="/directory.html">Directory</a>
+      <a href="/essentials.html" class="active">Expat Essentials</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html" class="nav-cta">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════════════ PAGE HERO ═══════════════════ -->
+<div class="page-hero">
+  <div class="container">
+    <h1>Expat Essentials</h1>
+    <p>Handpicked tools and services to make your life in Hua Hin easier, cheaper and more connected.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ INTRO ═══════════════════ -->
+<div class="essentials-intro">
+  <h2>Everything You Need in One Place</h2>
+  <p>Moving to or living in Hua Hin comes with a unique set of challenges — from sending money home affordably, to finding the right health insurance and staying safely connected online. We've gathered the services our community uses every day so you don't have to search.</p>
+</div>
+
+<!-- ═══════════════════ AFFILIATE CARDS ═══════════════════ -->
+<section class="affiliate-cards-section">
+
+  <!-- Disclaimer -->
+  <div class="disclaimer-bar">
+    <p><strong>Disclosure:</strong> Some links on this page are affiliate links. If you sign up or make a purchase through them, we may earn a small commission — at no extra cost to you. This helps keep HuaHin ExpatsPortal free. We only recommend services we believe are genuinely useful to expats in Hua Hin.</p>
+  </div>
+
+  <div class="affiliate-cards" style="margin-top: 28px;">
+
+    <!-- Wise -->
+    <div class="affiliate-card">
+      <div class="card-logo-area">
+        <div class="card-icon icon-wise">💸</div>
+        <div>
+          <div class="card-category">Money Transfer</div>
+          <p class="card-name">Wise</p>
+        </div>
+      </div>
+      <p class="card-desc">Send money home at the real exchange rate. Up to 8x cheaper than traditional banks — essential for expats moving funds between countries.</p>
+      <ul class="card-benefits">
+        <li>Real mid-market rate — no inflated exchange markups</li>
+        <li>Thailand bank transfers (THB) supported</li>
+        <li>Free borderless multi-currency account</li>
+        <li>iOS &amp; Android app with instant notifications</li>
+      </ul>
+      <div class="card-cta">
+        <a href="#" class="btn btn-primary" rel="noopener sponsored" target="_blank">Open Free Account</a>
+      </div>
+    </div>
+
+    <!-- Pacific Prime -->
+    <div class="affiliate-card">
+      <div class="card-logo-area">
+        <div class="card-icon icon-pp">🏥</div>
+        <div>
+          <div class="card-category">Health Insurance</div>
+          <p class="card-name">Pacific Prime</p>
+        </div>
+      </div>
+      <p class="card-desc">Compare expat health insurance plans from leading providers in Thailand. Independent brokers who work for you — not the insurer.</p>
+      <ul class="card-benefits">
+        <li>Independent broker — unbiased plan comparisons</li>
+        <li>Plans from ฿15,000/year for basic cover</li>
+        <li>English-speaking support team</li>
+        <li>Pre-existing conditions guidance available</li>
+      </ul>
+      <div class="card-cta">
+        <a href="#" class="btn btn-primary" rel="noopener sponsored" target="_blank">Get a Free Quote</a>
+      </div>
+    </div>
+
+    <!-- NordVPN -->
+    <div class="affiliate-card">
+      <div class="card-logo-area">
+        <div class="card-icon icon-vpn">🔒</div>
+        <div>
+          <div class="card-category">Online Security</div>
+          <p class="card-name">NordVPN</p>
+        </div>
+      </div>
+      <p class="card-desc">Access your home country streaming services, online banking and websites securely from Thailand. A VPN is essential kit for expats.</p>
+      <ul class="card-benefits">
+        <li>6,000+ servers across 60+ countries</li>
+        <li>Unblocks Netflix, BBC iPlayer &amp; more</li>
+        <li>30-day money-back guarantee</li>
+        <li>Connect up to 6 devices simultaneously</li>
+      </ul>
+      <div class="card-cta">
+        <a href="#" class="btn btn-primary" rel="noopener sponsored" target="_blank">Get NordVPN</a>
+      </div>
+    </div>
+
+    <!-- Agoda -->
+    <div class="affiliate-card">
+      <div class="card-logo-area">
+        <div class="card-icon icon-agoda">🏡</div>
+        <div>
+          <div class="card-category">Accommodation</div>
+          <p class="card-name">Agoda</p>
+        </div>
+      </div>
+      <p class="card-desc">Find condos, hotels and serviced apartments in Hua Hin with the best prices guaranteed. Great for your first weeks while you look for longer-term housing.</p>
+      <ul class="card-benefits">
+        <li>2M+ properties worldwide — hundreds in Hua Hin</li>
+        <li>Price Match Guarantee</li>
+        <li>Hua Hin local specialist listings</li>
+        <li>Instant booking confirmation</li>
+      </ul>
+      <div class="card-cta">
+        <a href="#" class="btn btn-primary" rel="noopener sponsored" target="_blank">Search Hua Hin Stays</a>
+      </div>
+    </div>
+
+    <!-- Skyscanner -->
+    <div class="affiliate-card">
+      <div class="card-logo-area">
+        <div class="card-icon icon-sky">✈️</div>
+        <div>
+          <div class="card-category">Flights</div>
+          <p class="card-name">Skyscanner</p>
+        </div>
+      </div>
+      <p class="card-desc">Compare flights to and from Hua Hin (via Bangkok) from hundreds of airlines. Find the cheapest dates and set price alerts for your route.</p>
+      <ul class="card-benefits">
+        <li>Best price alerts — never overpay again</li>
+        <li>Flexible date search across whole months</li>
+        <li>No hidden booking fees</li>
+        <li>Covers Bangkok Airways, AirAsia &amp; all majors</li>
+      </ul>
+      <div class="card-cta">
+        <a href="#" class="btn btn-primary" rel="noopener sponsored" target="_blank">Compare Flights</a>
+      </div>
+    </div>
+
+    <!-- Lazada -->
+    <div class="affiliate-card">
+      <div class="card-logo-area">
+        <div class="card-icon icon-lazada">🛒</div>
+        <div>
+          <div class="card-category">Online Shopping</div>
+          <p class="card-name">Lazada</p>
+        </div>
+      </div>
+      <p class="card-desc">Thailand's largest online marketplace. Get electronics, groceries, homeware and more delivered straight to your door in Hua Hin.</p>
+      <ul class="card-benefits">
+        <li>Same-day and next-day delivery available</li>
+        <li>English language interface</li>
+        <li>Electronics, groceries, furniture &amp; more</li>
+        <li>LazMall — verified, trusted sellers only</li>
+      </ul>
+      <div class="card-cta">
+        <a href="#" class="btn btn-primary" rel="noopener sponsored" target="_blank">Shop on Lazada</a>
+      </div>
+    </div>
+
+  </div><!-- /.affiliate-cards -->
+</section>
+
+<!-- ═══════════════════ WHY WE RECOMMEND ═══════════════════ -->
+<section class="why-section">
+  <div class="why-inner">
+    <h2>Why We Recommend These Services</h2>
+    <p class="lead">Every service listed on this page has been personally tested by our team or is consistently recommended by the HuaHin expat community. We turn down partnerships with services we wouldn't use ourselves.</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-icon">🤝</span>
+        <h3>Community Tested</h3>
+        <p>Recommendations come from real expats living in Hua Hin, not marketing copy. If our community doesn't rate it, we don't list it.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔍</span>
+        <h3>Independently Reviewed</h3>
+        <p>We research each provider's pricing, terms and reputation before recommending them. Our editorial judgement is never for sale.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">💰</span>
+        <h3>No Extra Cost to You</h3>
+        <p>Affiliate commissions come from the provider, not from you. You pay exactly the same price as going direct — often less with our links.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔄</span>
+        <h3>Regularly Updated</h3>
+        <p>Expat needs and available services change. We review our recommendations regularly and remove anything that no longer meets the mark.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="/images/logo-huahin-expatsportal.png" alt="HuaHin ExpatsPortal" class="footer-logo">
+      <p>Your complete guide to expat life in Hua Hin, Thailand.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Navigate</h4>
+      <a href="/">Home</a>
+      <a href="/moving.html">Moving Here</a>
+      <a href="/living.html">Living Here</a>
+      <a href="/directory.html">Directory</a>
+      <a href="/essentials.html">Expat Essentials</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Resources</h4>
+      <a href="/directory.html?category=medical-dental">Medical Directory</a>
+      <a href="/directory.html?category=legal-visa">Visa Services</a>
+      <a href="/directory.html?category=real-estate">Real Estate</a>
+      <a href="/directory.html?category=restaurants">Restaurants</a>
+    </div>
+    <div class="footer-links">
+      <h4>Information</h4>
+      <p style="font-size:0.85rem;color:#aaa;">Some links on this page are affiliate links. We may earn a small commission at no extra cost to you.</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 HuaHin ExpatsPortal. All rights reserved. | <a href="/contact.html">Contact Us</a></p>
+  </div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('site-nav');
+  hamburger.addEventListener('click', () => { nav.classList.toggle('open'); hamburger.classList.toggle('open'); });
+</script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Affiliate Dashboard — HuaHin ExpatsPortal Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/images/logo-huahin-expatsportal.png">
+  <style>
+    body { background: #f0f2f5; }
+    .admin-header {
+      background: #1A2035;
+      color: #fff;
+      padding: 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .admin-header .brand { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+    .admin-header nav a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .admin-header nav a:hover, .admin-header nav a.active { background: rgba(255,255,255,0.12); color: #fff; }
+    .admin-main { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+    .admin-title { font-size: 1.7rem; color: #1A2035; margin-bottom: 6px; }
+    .admin-subtitle { color: #666; margin-bottom: 30px; font-size: 0.95rem; }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 22px 20px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      text-align: center;
+    }
+    .stat-card .num { font-size: 2rem; font-weight: 800; color: #E8650A; display: block; }
+    .stat-card .lbl { font-size: 0.82rem; color: #888; margin-top: 4px; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header h2 { font-size: 1.1rem; color: #1A2035; margin: 0; }
+    .btn-sm {
+      padding: 8px 16px;
+      background: #E8650A;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .affiliate-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .affiliate-table th {
+      background: #f8f9fa;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 700;
+      color: #444;
+      border-bottom: 2px solid #eee;
+      white-space: nowrap;
+    }
+    .affiliate-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    .affiliate-table tr:last-child td { border-bottom: none; }
+    .affiliate-table tr:hover td { background: #fafafa; }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-paused { background: #f3f4f6; color: #6b7280; }
+    .affiliate-logo {
+      font-size: 1.4rem;
+      margin-right: 8px;
+    }
+    .affiliate-name { font-weight: 600; color: #1A2035; }
+    .affiliate-url { color: #888; font-size: 0.82rem; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn-edit {
+      padding: 5px 12px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-copy {
+      padding: 5px 12px;
+      background: #f0fdf4;
+      color: #166534;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .commission-badge {
+      background: #fff7ed;
+      color: #c2410c;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f2f5;
+    }
+    .login-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 48px 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      width: 360px;
+      text-align: center;
+    }
+    .login-box h1 { font-size: 1.6rem; color: #1A2035; margin-bottom: 8px; }
+    .login-box p { color: #888; margin-bottom: 28px; font-size: 0.92rem; }
+    .login-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .login-box input:focus { border-color: #E8650A; }
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      background: #E8650A;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #dashboard { display: none; }
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .affiliate-table { font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="font-size:2.5rem;margin-bottom:12px;">🔐</div>
+    <h1>Affiliate Admin</h1>
+    <p>HuaHin ExpatsPortal</p>
+    <input type="password" id="admin-password" placeholder="Admin password" onkeypress="if(event.key==='Enter')login()">
+    <button onclick="login()">Log In</button>
+    <p id="login-error" style="color:#dc2626;font-size:0.85rem;margin-top:10px;display:none;">Incorrect password</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="admin-header">
+    <div class="brand">
+      <span>⚙️</span>
+      HuaHin ExpatsPortal — Admin
+    </div>
+    <nav>
+      <a href="/admin.html">Reviews</a>
+      <a href="/admin/affiliates.html" class="active">Affiliates</a>
+      <a href="/directory.html" target="_blank">View Site</a>
+      <a href="#" onclick="logout()">Log Out</a>
+    </nav>
+  </div>
+
+  <div class="admin-main">
+    <h1 class="admin-title">Affiliate Register</h1>
+    <p class="admin-subtitle">Manage affiliate partnerships, commission rates and tracking links.</p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="num">6</span>
+        <span class="lbl">Active Partners</span>
+      </div>
+      <div class="stat-card">
+        <span class="num">—</span>
+        <span class="lbl">This Month Clicks</span>
+      </div>
+      <div class="stat-card">
+        <span class="num">—</span>
+        <span class="lbl">Est. Commissions</span>
+      </div>
+      <div class="stat-card">
+        <span class="num">6</span>
+        <span class="lbl">Placements</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Active Affiliates</h2>
+        <button class="btn-sm" onclick="alert('Contact stevegray1957@gmail.com to add new affiliates')">+ Add Affiliate</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="affiliate-table" id="affiliate-table">
+          <thead>
+            <tr>
+              <th>Partner</th>
+              <th>Category</th>
+              <th>Commission</th>
+              <th>Placement Page</th>
+              <th>Status</th>
+              <th>Affiliate URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="affiliate-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>📋 Notes &amp; Guidelines</h2>
+      </div>
+      <div style="padding:24px;">
+        <p style="font-size:0.92rem;color:#555;line-height:1.7;margin:0 0 12px;">
+          <strong>All affiliate links must:</strong>
+        </p>
+        <ul style="font-size:0.92rem;color:#555;line-height:1.85;padding-left:20px;">
+          <li>Be disclosed with <code>rel="noopener sponsored"</code> on the anchor tag</li>
+          <li>Have a visible affiliate disclaimer on the same page ("Some links are affiliate links...")</li>
+          <li>Link to services that are genuinely useful to Hua Hin expats</li>
+          <li>Not be placed in editorial content without clear labelling</li>
+        </ul>
+        <p style="font-size:0.9rem;color:#888;margin-top:12px;">
+          Update affiliate links in <code>/public/essentials.html</code>. The tracking links in this table are stored locally and not yet connected to live analytics.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const AFFILIATES = [
+    {
+      logo: '💸',
+      name: 'Wise (TransferWise)',
+      category: 'Money Transfer',
+      commission: '£10–£50 CPA',
+      page: 'essentials.html',
+      status: 'active',
+      url: 'https://wise.com/invite/...',
+      notes: 'Per account opened & funded'
+    },
+    {
+      logo: '🏥',
+      name: 'Pacific Prime',
+      category: 'Health Insurance',
+      commission: '10–15% first year',
+      page: 'essentials.html',
+      status: 'pending',
+      url: 'https://www.pacificprime.com/?ref=...',
+      notes: 'Apply via broker portal'
+    },
+    {
+      logo: '🔒',
+      name: 'NordVPN',
+      category: 'Tech & VPN',
+      commission: '40% recurring',
+      page: 'essentials.html + blog',
+      status: 'pending',
+      url: 'https://nordvpn.com/...',
+      notes: 'Via Impact or direct'
+    },
+    {
+      logo: '🏨',
+      name: 'Agoda',
+      category: 'Accommodation',
+      commission: '4–7% per booking',
+      page: 'essentials.html',
+      status: 'active',
+      url: 'https://www.agoda.com/partners/...',
+      notes: 'Apply via Agoda Partner Hub'
+    },
+    {
+      logo: '✈️',
+      name: 'Skyscanner',
+      category: 'Flights',
+      commission: '50% revenue share',
+      page: 'essentials.html',
+      status: 'pending',
+      url: 'https://www.skyscanner.net/affiliates/...',
+      notes: 'Apply via Skyscanner Partners'
+    },
+    {
+      logo: '🛒',
+      name: 'Lazada Thailand',
+      category: 'E-Commerce',
+      commission: '1–5% per sale',
+      page: 'essentials.html',
+      status: 'pending',
+      url: 'https://affiliate.lazada.co.th/...',
+      notes: 'Via Lazada Affiliate Program'
+    }
+  ];
+
+  function renderAffiliates() {
+    const tbody = document.getElementById('affiliate-tbody');
+    tbody.innerHTML = AFFILIATES.map((a, i) => `
+      <tr>
+        <td>
+          <span class="affiliate-logo">${a.logo}</span>
+          <span class="affiliate-name">${a.name}</span>
+        </td>
+        <td>${a.category}</td>
+        <td><span class="commission-badge">${a.commission}</span></td>
+        <td><code style="font-size:0.82rem;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${a.page}</code></td>
+        <td>
+          <span class="status-badge ${a.status === 'active' ? 'status-active' : a.status === 'pending' ? 'status-pending' : 'status-paused'}">
+            ${a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+          </span>
+        </td>
+        <td><span class="affiliate-url">${a.url}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-edit" onclick="editAffiliate(${i})">Edit</button>
+            <button class="btn-copy" onclick="copyUrl('${a.url}')">Copy URL</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function editAffiliate(i) {
+    const a = AFFILIATES[i];
+    const newUrl = prompt('Update affiliate URL for ' + a.name + ':', a.url);
+    if (newUrl !== null) {
+      AFFILIATES[i].url = newUrl;
+      renderAffiliates();
+      alert('Updated! Remember to also update the URL in essentials.html');
+    }
+  }
+
+  function copyUrl(url) {
+    navigator.clipboard.writeText(url).then(() => alert('Copied: ' + url));
+  }
+
+  function login() {
+    const pw = document.getElementById('admin-password').value;
+    fetch('/api/admin/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.token) {
+        sessionStorage.setItem('adminToken', d.token);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        renderAffiliates();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    })
+    .catch(() => {
+      document.getElementById('login-error').style.display = 'block';
+    });
+  }
+
+  function logout() {
+    sessionStorage.removeItem('adminToken');
+    location.reload();
+  }
+
+  // Auto-login if token exists
+  const token = sessionStorage.getItem('adminToken');
+  if (token) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    renderAffiliates();
+  }
+</script>
+</body>
+</html>
