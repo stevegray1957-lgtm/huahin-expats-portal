@@ -1,15 +1,20 @@
 'use strict';
 const { query } = require('../../database');
 
+// Env-var bootstraps. The DB row in `settings` always wins; these only fill
+// gaps the operator hasn't set via the admin UI yet. Useful for first-boot
+// (admin can't open the settings page without a configured admin password).
+const ENV = process.env;
+
 const DEFAULTS = {
   airwallex: {
-    mode: 'sandbox',
-    client_id: '',
-    api_key: '',
-    webhook_secret: '',
+    mode: ENV.AIRWALLEX_MODE || 'sandbox',
+    client_id: ENV.AIRWALLEX_CLIENT_ID || '',
+    api_key: ENV.AIRWALLEX_API_KEY || '',
+    webhook_secret: ENV.AIRWALLEX_WEBHOOK_SECRET || '',
     account_currency: 'THB',
-    success_url: '',
-    cancel_url: '',
+    success_url: ENV.BASE_URL ? `${ENV.BASE_URL.replace(/\/$/, '')}/upgrade-success.html` : '',
+    cancel_url:  ENV.BASE_URL ? `${ENV.BASE_URL.replace(/\/$/, '')}/upgrade-cancel.html`  : '',
     enabled: false,
     tiers: {
       premium:      { label: 'Premium',      amount: 990,  currency: 'THB', duration_days: 365 },
@@ -23,7 +28,7 @@ const DEFAULTS = {
     note: 'Stripe was never implemented in this codebase. Kept here as a future fallback toggle.',
   },
   enrichment: {
-    google_places_api_key: '',
+    google_places_api_key: ENV.GOOGLE_PLACES_API_KEY || '',
     daily_request_cap: 500,
     per_run_request_cap: 100,
     allowed_categories: ['restaurants','laundry','massage','pet-services','handyman','car-rental','medical-dental','visa-legal'],
