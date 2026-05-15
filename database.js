@@ -57,19 +57,180 @@ async function initSchema() {
       submitted_at     TIMESTAMPTZ DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS idx_edits_status ON edit_suggestions(status);
+
+    ALTER TABLE listings ADD COLUMN IF NOT EXISTS premium_level TEXT;
+    ALTER TABLE listings ADD COLUMN IF NOT EXISTS premium_expires_at TIMESTAMPTZ;
+    ALTER TABLE listings ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT FALSE;
+    ALTER TABLE listings ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE;
+    ALTER TABLE listings ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+    ALTER TABLE listings ADD COLUMN IF NOT EXISTS owner_email TEXT;
+
+    CREATE TABLE IF NOT EXISTS settings (
+      key        TEXT PRIMARY KEY,
+      value      JSONB NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS audit_log (
+      id         SERIAL PRIMARY KEY,
+      action     TEXT NOT NULL,
+      actor      TEXT,
+      target     TEXT,
+      details    JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action);
+    CREATE INDEX IF NOT EXISTS idx_audit_target ON audit_log(target);
+
+    CREATE TABLE IF NOT EXISTS payments (
+      id                   SERIAL PRIMARY KEY,
+      listing_id           TEXT NOT NULL,
+      owner_email          TEXT,
+      tier                 TEXT NOT NULL,
+      amount               NUMERIC(10,2) NOT NULL,
+      currency             TEXT NOT NULL DEFAULT 'THB',
+      provider             TEXT NOT NULL DEFAULT 'airwallex',
+      mode                 TEXT NOT NULL DEFAULT 'sandbox',
+      provider_payment_id  TEXT,
+      provider_link_id     TEXT,
+      hosted_url           TEXT,
+      status               TEXT NOT NULL DEFAULT 'pending'
+                              CHECK(status IN ('pending','succeeded','failed','cancelled','expired','refunded')),
+      metadata             JSONB DEFAULT '{}',
+      created_at           TIMESTAMPTZ DEFAULT NOW(),
+      paid_at              TIMESTAMPTZ,
+      reviewed_at          TIMESTAMPTZ,
+      last_webhook_event   TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_payments_listing ON payments(listing_id);
+    CREATE INDEX IF NOT EXISTS idx_payments_status  ON payments(status);
+    CREATE INDEX IF NOT EXISTS idx_payments_provider_pid ON payments(provider_payment_id);
+
+    CREATE TABLE IF NOT EXISTS payment_events (
+      id            SERIAL PRIMARY KEY,
+      provider      TEXT NOT NULL,
+      event_id      TEXT NOT NULL,
+      event_type    TEXT NOT NULL,
+      payment_id    INTEGER REFERENCES payments(id) ON DELETE SET NULL,
+      payload       JSONB NOT NULL,
+      processed_at  TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(provider, event_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS discovery_jobs (
+      id                 SERIAL PRIMARY KEY,
+      name               TEXT NOT NULL,
+      source             TEXT NOT NULL DEFAULT 'google_places',
+      category_target    TEXT,
+      search_query       TEXT NOT NULL,
+      radius_meters      INTEGER,
+      center_lat         NUMERIC(9,6),
+      center_lng         NUMERIC(9,6),
+      max_results        INTEGER DEFAULT 60,
+      status             TEXT NOT NULL DEFAULT 'queued'
+                            CHECK(status IN ('queued','running','done','failed','cancelled')),
+      created_by         TEXT,
+      started_at         TIMESTAMPTZ,
+      finished_at        TIMESTAMPTZ,
+      total_found        INTEGER DEFAULT 0,
+      candidates_created INTEGER DEFAULT 0,
+      duplicates_found   INTEGER DEFAULT 0,
+      errors             INTEGER DEFAULT 0,
+      error_log          JSONB DEFAULT '[]',
+      created_at         TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS candidates (
+      id                          SERIAL PRIMARY KEY,
+      source                      TEXT NOT NULL,
+      source_place_id             TEXT,
+      source_url                  TEXT,
+      source_capture_date         TIMESTAMPTZ DEFAULT NOW(),
+      source_confidence           NUMERIC(3,2),
+      business_name               TEXT NOT NULL,
+      business_type               TEXT,
+      mapped_directory_category   TEXT,
+      full_address                TEXT,
+      phone                       TEXT,
+      website_url                 TEXT,
+      facebook_url                TEXT,
+      facebook_url_provenance     TEXT,
+      instagram_url               TEXT,
+      instagram_url_provenance    TEXT,
+      tiktok_url                  TEXT,
+      tiktok_url_provenance       TEXT,
+      google_maps_url             TEXT,
+      latitude                    NUMERIC(9,6),
+      longitude                   NUMERIC(9,6),
+      opening_hours               JSONB,
+      business_status             TEXT,
+      photo_reference             TEXT,
+      notes_internal              TEXT,
+      public_note                 TEXT,
+      duplicate_match_listing_id  TEXT,
+      conflict_status             TEXT DEFAULT 'none'
+                                    CHECK(conflict_status IN ('none','pending','resolved')),
+      approval_status             TEXT NOT NULL DEFAULT 'pending'
+                                    CHECK(approval_status IN ('pending','approved','rejected','merged','needs_verification')),
+      dq_score                    NUMERIC(3,2),
+      job_id                      INTEGER REFERENCES discovery_jobs(id) ON DELETE SET NULL,
+      raw_payload                 JSONB,
+      created_at                  TIMESTAMPTZ DEFAULT NOW(),
+      updated_at                  TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(source, source_place_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_candidates_status ON candidates(approval_status);
+    CREATE INDEX IF NOT EXISTS idx_candidates_dup    ON candidates(duplicate_match_listing_id);
+    CREATE INDEX IF NOT EXISTS idx_candidates_cat    ON candidates(mapped_directory_category);
+
+    CREATE TABLE IF NOT EXISTS candidate_conflicts (
+      id            SERIAL PRIMARY KEY,
+      candidate_id  INTEGER NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
+      listing_id    TEXT,
+      field_name    TEXT NOT NULL,
+      existing_value TEXT,
+      new_value     TEXT,
+      source        TEXT,
+      resolution    TEXT,
+      resolved_at   TIMESTAMPTZ,
+      created_at    TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_conflicts_candidate ON candidate_conflicts(candidate_id);
+
+    CREATE TABLE IF NOT EXISTS import_logs (
+      id           SERIAL PRIMARY KEY,
+      job_id       INTEGER REFERENCES discovery_jobs(id) ON DELETE SET NULL,
+      candidate_id INTEGER REFERENCES candidates(id) ON DELETE SET NULL,
+      level        TEXT NOT NULL DEFAULT 'info'
+                      CHECK(level IN ('info','warn','error')),
+      message      TEXT NOT NULL,
+      details      JSONB DEFAULT '{}',
+      created_at   TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_import_logs_job ON import_logs(job_id);
+
+    CREATE TABLE IF NOT EXISTS api_usage (
+      id         SERIAL PRIMARY KEY,
+      provider   TEXT NOT NULL,
+      endpoint   TEXT NOT NULL,
+      cost_units NUMERIC(8,2) DEFAULT 1,
+      job_id     INTEGER,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_usage_provider ON api_usage(provider);
   `);
 }
 
 // ─── Listings ─────────────────────────────────────────────────────────────────
 
 async function getAllListings() {
-  const r = await query('SELECT id, category, category_slug, name, data FROM listings ORDER BY category, name');
+  const r = await query('SELECT id, category, category_slug, name, data, premium_level, premium_expires_at, verified, featured FROM listings ORDER BY category, name');
   return r.rows;
 }
 
 async function getListingsByCategory(slug) {
   const r = await query(
-    'SELECT id, category, category_slug, name, data FROM listings WHERE category_slug=$1 ORDER BY name',
+    'SELECT id, category, category_slug, name, data, premium_level, premium_expires_at, verified, featured FROM listings WHERE category_slug=$1 ORDER BY name',
     [slug]
   );
   return r.rows;
@@ -77,7 +238,7 @@ async function getListingsByCategory(slug) {
 
 async function getListingById(id) {
   const r = await query(
-    'SELECT id, category, category_slug, name, data FROM listings WHERE id=$1',
+    'SELECT id, category, category_slug, name, data, premium_level, premium_expires_at, verified, featured FROM listings WHERE id=$1',
     [id]
   );
   return r.rows[0] || null;
@@ -86,7 +247,7 @@ async function getListingById(id) {
 async function searchListings(q) {
   const like = `%${q.toLowerCase()}%`;
   const r = await query(
-    `SELECT id, category, category_slug, name, data FROM listings
+    `SELECT id, category, category_slug, name, data, premium_level, premium_expires_at, verified, featured FROM listings
      WHERE LOWER(name) LIKE $1 OR LOWER(data::text) LIKE $1
      ORDER BY category, name`,
     [like]
@@ -195,7 +356,7 @@ async function resolveEdit(id, action) {
 }
 
 module.exports = {
-  initSchema,
+  pool, query, initSchema,
   getAllListings, getListingsByCategory, getListingById, searchListings, upsertListing, getCategories,
   submitReview, getApprovedReviews, getAvgRating, getPendingReviews, getPublishedReviews,
   approveReview, rejectReview, deleteReview,

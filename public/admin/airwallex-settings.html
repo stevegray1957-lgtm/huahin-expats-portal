@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Airwallex Settings | HuaHin Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { background:#F0F4F8; font-family:system-ui,sans-serif; margin:0; }
+  header { background:#1A2035; color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; }
+  header a { color:#E8650A; text-decoration:none; }
+  main { max-width:880px; margin:24px auto; padding:0 16px; }
+  .card { background:#fff; border-radius:10px; padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:16px; }
+  .card h2 { margin-top:0; }
+  label { display:block; margin:12px 0 4px; font-weight:600; font-size:.88rem; color:#1A2035; }
+  input, select { width:100%; padding:8px 10px; border:1px solid #cdd5e0; border-radius:6px; font-size:.92rem; box-sizing:border-box; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .tier-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; align-items:end; margin-bottom:10px; }
+  .tier-row label { margin:0; font-size:.78rem; }
+  button { background:#1A3F8F; color:#fff; border:0; padding:10px 18px; border-radius:6px; cursor:pointer; font-weight:600; }
+  button.secondary { background:#fff; color:#1A3F8F; border:1px solid #1A3F8F; }
+  .muted { color:#666; font-size:.85rem; }
+  .ok { color:#0a7c2f; }
+  .err { color:#cc1a1a; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.78rem; }
+  .pill.sandbox { background:#fef0d8; color:#7a4500; }
+  .pill.live { background:#d8f0e2; color:#0a5c2c; }
+  .copy-input { display:flex; gap:8px; }
+  .copy-input input { font-family:monospace; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <div>HuaHinExpats — <strong>Airwallex Settings</strong></div>
+  <div><a href="/admin.html">← Admin Home</a> &middot; <a href="/admin/payments.html">Payments</a></div>
+</header>
+
+<main>
+  <div id="auth" class="card" style="display:none">
+    <h2>Sign in</h2>
+    <p class="muted">Enter your admin password to continue.</p>
+    <input type="password" id="pw" placeholder="Admin password" />
+    <p class="err" id="auth-err" style="display:none">Invalid password.</p>
+    <button onclick="signIn()">Sign in</button>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="card">
+      <h2>Provider <span id="mode-pill" class="pill sandbox">sandbox</span></h2>
+      <div class="row">
+        <div>
+          <label>Mode</label>
+          <select id="mode">
+            <option value="sandbox">Sandbox</option>
+            <option value="live">Live</option>
+          </select>
+        </div>
+        <div>
+          <label>Account currency</label>
+          <input id="account_currency" placeholder="THB"/>
+        </div>
+      </div>
+      <label>Client ID</label>
+      <input id="client_id" autocomplete="off" />
+      <label>API key</label>
+      <input id="api_key" type="password" autocomplete="new-password" placeholder="hidden — leave unchanged to keep" />
+      <label>Webhook secret</label>
+      <input id="webhook_secret" type="password" autocomplete="new-password" placeholder="hidden — leave unchanged to keep" />
+
+      <div class="row" style="margin-top:12px">
+        <div>
+          <label>Success URL</label>
+          <input id="success_url" placeholder="https://huahinexpatsportal.com/upgrade-success.html" />
+        </div>
+        <div>
+          <label>Cancel URL</label>
+          <input id="cancel_url" placeholder="https://huahinexpatsportal.com/upgrade-cancel.html" />
+        </div>
+      </div>
+      <label style="margin-top:14px"><input type="checkbox" id="enabled" /> Enabled (allow new checkouts)</label>
+
+      <div style="margin-top:16px">
+        <button onclick="save()">Save settings</button>
+        <button class="secondary" onclick="testAuth()">Test connection</button>
+        <span id="status" class="muted" style="margin-left:10px"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Webhook URL</h2>
+      <p class="muted">Paste this URL into your Airwallex webhook settings. Save your webhook signing secret above. Endpoint verifies HMAC SHA-256 of <code>timestamp + body</code>.</p>
+      <div class="copy-input">
+        <input id="webhook_url" readonly />
+        <button class="secondary" onclick="copyWebhook()">Copy</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Tier pricing</h2>
+      <p class="muted">Amounts are in the tier's currency. Duration is added to current expiry on successful payment.</p>
+      <div id="tiers"></div>
+    </div>
+
+    <div class="card">
+      <h2>Stripe fallback</h2>
+      <p class="muted">This codebase has no existing Stripe integration. A toggle is reserved here for a future fallback implementation.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+let token = sessionStorage.getItem('adminToken') || '';
+const TIER_KEYS = ['premium','premium_plus','verified','featured'];
+
+function authed() { return { 'Content-Type':'application/json', 'x-admin-token': token }; }
+
+async function signIn() {
+  const pw = document.getElementById('pw').value;
+  const r = await fetch('/api/admin/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw })});
+  const data = await r.json();
+  if (r.ok) { token = data.token; sessionStorage.setItem('adminToken', token); show(); }
+  else document.getElementById('auth-err').style.display = 'block';
+}
+
+async function show() {
+  document.getElementById('auth').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  await load();
+  const w = await fetch('/api/admin/airwallex-settings/webhook-url', { headers: authed() }).then(r=>r.json());
+  document.getElementById('webhook_url').value = w.url || '';
+}
+
+async function load() {
+  const r = await fetch('/api/admin/airwallex-settings', { headers: authed() });
+  if (r.status === 401) { token = ''; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='block'; return; }
+  const cfg = await r.json();
+  document.getElementById('mode').value = cfg.mode || 'sandbox';
+  document.getElementById('mode-pill').textContent = cfg.mode;
+  document.getElementById('mode-pill').className = 'pill ' + (cfg.mode || 'sandbox');
+  document.getElementById('account_currency').value = cfg.account_currency || '';
+  document.getElementById('client_id').value = cfg.client_id || '';
+  document.getElementById('api_key').placeholder = cfg.api_key ? `Stored: ${cfg.api_key}` : 'not set';
+  document.getElementById('webhook_secret').placeholder = cfg.webhook_secret ? `Stored: ${cfg.webhook_secret}` : 'not set';
+  document.getElementById('success_url').value = cfg.success_url || '';
+  document.getElementById('cancel_url').value = cfg.cancel_url || '';
+  document.getElementById('enabled').checked = !!cfg.enabled;
+
+  const tiersHtml = TIER_KEYS.map(k => {
+    const t = cfg.tiers?.[k] || {};
+    return `<div class="tier-row" data-tier="${k}">
+      <div><label>Label (${k})</label><input class="t-label" value="${t.label || k}"></div>
+      <div><label>Amount</label><input class="t-amount" type="number" min="0" step="1" value="${t.amount ?? 0}"></div>
+      <div><label>Currency</label><input class="t-currency" value="${t.currency || 'THB'}"></div>
+      <div><label>Days</label><input class="t-duration" type="number" min="1" value="${t.duration_days ?? 365}"></div>
+    </div>`;
+  }).join('');
+  document.getElementById('tiers').innerHTML = tiersHtml;
+}
+
+async function save() {
+  const tiers = {};
+  document.querySelectorAll('#tiers .tier-row').forEach(row => {
+    const k = row.dataset.tier;
+    tiers[k] = {
+      label: row.querySelector('.t-label').value.trim(),
+      amount: parseFloat(row.querySelector('.t-amount').value) || 0,
+      currency: row.querySelector('.t-currency').value.trim().toUpperCase() || 'THB',
+      duration_days: parseInt(row.querySelector('.t-duration').value, 10) || 365,
+    };
+  });
+  const body = {
+    mode: document.getElementById('mode').value,
+    account_currency: document.getElementById('account_currency').value.trim().toUpperCase() || 'THB',
+    client_id: document.getElementById('client_id').value.trim(),
+    success_url: document.getElementById('success_url').value.trim(),
+    cancel_url: document.getElementById('cancel_url').value.trim(),
+    enabled: document.getElementById('enabled').checked,
+    tiers,
+  };
+  const apiKey = document.getElementById('api_key').value;
+  const ws = document.getElementById('webhook_secret').value;
+  if (apiKey && !apiKey.includes('…')) body.api_key = apiKey;
+  if (ws && !ws.includes('…')) body.webhook_secret = ws;
+  const r = await fetch('/api/admin/airwallex-settings', { method:'PUT', headers: authed(), body: JSON.stringify(body) });
+  if (r.ok) {
+    document.getElementById('status').textContent = 'Saved.';
+    document.getElementById('status').className = 'ok';
+    document.getElementById('api_key').value = '';
+    document.getElementById('webhook_secret').value = '';
+    await load();
+  } else {
+    const e = await r.json();
+    document.getElementById('status').textContent = e.error || 'Save failed';
+    document.getElementById('status').className = 'err';
+  }
+}
+
+async function testAuth() {
+  document.getElementById('status').textContent = 'Testing…';
+  const r = await fetch('/api/admin/airwallex-settings/test', { method:'POST', headers: authed() });
+  const d = await r.json();
+  document.getElementById('status').textContent = d.ok ? 'OK — credentials valid.' : ('Failed: ' + d.error);
+  document.getElementById('status').className = d.ok ? 'ok' : 'err';
+}
+
+function copyWebhook() {
+  const i = document.getElementById('webhook_url');
+  i.select(); document.execCommand('copy');
+}
+
+if (token) show(); else document.getElementById('auth').style.display='block';
+</script>
+</body>
+</html>

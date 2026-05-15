@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payments | HuaHin Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { background:#F0F4F8; font-family:system-ui,sans-serif; margin:0; }
+  header { background:#1A2035; color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; }
+  header a { color:#E8650A; text-decoration:none; }
+  main { max-width:1180px; margin:24px auto; padding:0 16px; }
+  .card { background:#fff; border-radius:10px; padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:16px; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  th, td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; vertical-align:top; }
+  th { color:#666; font-weight:600; background:#f7f9fc; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.74rem; font-weight:600; }
+  .pill.pending  { background:#fef0d8; color:#7a4500; }
+  .pill.succeeded{ background:#d8f0e2; color:#0a5c2c; }
+  .pill.failed, .pill.cancelled, .pill.expired { background:#f8d7d7; color:#a02020; }
+  .pill.refunded { background:#dde3ee; color:#1A3F8F; }
+  button { background:#1A3F8F; color:#fff; border:0; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:.82rem; }
+  button.secondary { background:#fff; color:#1A3F8F; border:1px solid #1A3F8F; }
+  .filters { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+  select, input { padding:6px 8px; border:1px solid #cdd5e0; border-radius:6px; font-size:.88rem; }
+  details summary { cursor:pointer; color:#1A3F8F; }
+  code { font-family:monospace; background:#f0f4f8; padding:1px 5px; border-radius:3px; font-size:.78rem; }
+</style>
+</head>
+<body>
+<header>
+  <div>HuaHinExpats — <strong>Payments</strong></div>
+  <div><a href="/admin.html">← Admin Home</a> &middot; <a href="/admin/airwallex-settings.html">Airwallex Settings</a></div>
+</header>
+
+<main>
+  <div id="auth" class="card" style="display:none">
+    <h2>Sign in</h2>
+    <input type="password" id="pw" placeholder="Admin password" />
+    <button onclick="signIn()">Sign in</button>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="card">
+      <div class="filters">
+        <label>Status:</label>
+        <select id="status-filter">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="succeeded">Succeeded</option>
+          <option value="failed">Failed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="expired">Expired</option>
+          <option value="refunded">Refunded</option>
+        </select>
+        <button class="secondary" onclick="load()">Refresh</button>
+      </div>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Listing</th><th>Owner</th><th>Tier</th><th>Amount</th><th>Status</th>
+          <th>Created</th><th>Paid</th><th>Provider ID</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="rows"><tr><td colspan="10">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+let token = sessionStorage.getItem('adminToken') || '';
+function authed() { return { 'Content-Type':'application/json', 'x-admin-token': token }; }
+
+async function signIn() {
+  const pw = document.getElementById('pw').value;
+  const r = await fetch('/api/admin/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw })});
+  const data = await r.json();
+  if (r.ok) { token = data.token; sessionStorage.setItem('adminToken', token); show(); }
+}
+
+async function show() {
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='block';
+  await load();
+}
+
+function esc(s) { return s == null ? '' : String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function fmt(d) { return d ? new Date(d).toLocaleString() : ''; }
+
+async function load() {
+  const status = document.getElementById('status-filter').value;
+  const url = '/api/admin/payments' + (status ? `?status=${status}` : '');
+  const r = await fetch(url, { headers: authed() });
+  if (r.status === 401) { document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='block'; return; }
+  const rows = await r.json();
+  if (!rows.length) { document.getElementById('rows').innerHTML = '<tr><td colspan="10">No payments yet.</td></tr>'; return; }
+  document.getElementById('rows').innerHTML = rows.map(p => `
+    <tr>
+      <td>${p.id}</td>
+      <td>${esc(p.listing_id)}<br><small>${esc(p.metadata?.listing_name||'')}</small></td>
+      <td>${esc(p.owner_email||'—')}</td>
+      <td>${esc(p.tier)}</td>
+      <td>${p.amount} ${esc(p.currency)}</td>
+      <td><span class="pill ${p.status}">${p.status}</span></td>
+      <td>${fmt(p.created_at)}</td>
+      <td>${fmt(p.paid_at)}</td>
+      <td>
+        ${p.hosted_url ? `<a href="${esc(p.hosted_url)}" target="_blank" rel="noopener">link</a><br>` : ''}
+        ${p.provider_payment_id ? `<code>${esc(p.provider_payment_id.slice(0,16))}…</code><br>` : ''}
+        ${p.provider_link_id ? `<small><code>${esc(p.provider_link_id.slice(0,16))}…</code></small>` : ''}
+      </td>
+      <td>
+        <button class="secondary" onclick="sync(${p.id})">Retry sync</button>
+        <button class="secondary" onclick="markReviewed(${p.id})">Mark reviewed</button>
+        <button class="secondary" onclick="details(${p.id})">Events</button>
+      </td>
+    </tr>
+    <tr id="events-${p.id}" style="display:none"><td colspan="10"><pre style="white-space:pre-wrap;font-size:.78rem"></pre></td></tr>
+  `).join('');
+}
+
+async function sync(id) {
+  const r = await fetch(`/api/admin/payments/${id}/retry-sync`, { method:'POST', headers: authed() });
+  const d = await r.json();
+  alert(r.ok ? 'Sync ok: ' + JSON.stringify(d.payment?.status) : 'Sync failed: ' + (d.error || r.status));
+  await load();
+}
+
+async function markReviewed(id) {
+  await fetch(`/api/admin/payments/${id}/mark-reviewed`, { method:'POST', headers: authed() });
+  await load();
+}
+
+async function details(id) {
+  const row = document.getElementById('events-' + id);
+  if (row.style.display === 'table-row') { row.style.display='none'; return; }
+  const r = await fetch(`/api/admin/payments/${id}`, { headers: authed() });
+  const d = await r.json();
+  row.style.display='table-row';
+  row.querySelector('pre').textContent = JSON.stringify(d.events || [], null, 2);
+}
+
+document.getElementById('status-filter').addEventListener('change', load);
+if (token) show(); else document.getElementById('auth').style.display='block';
+</script>
+</body>
+</html>

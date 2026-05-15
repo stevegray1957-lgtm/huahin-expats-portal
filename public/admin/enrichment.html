@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Source Enrichment | HuaHin Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { background:#F0F4F8; font-family:system-ui,sans-serif; margin:0; }
+  header { background:#1A2035; color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; }
+  header a { color:#E8650A; text-decoration:none; }
+  main { max-width:1200px; margin:24px auto; padding:0 16px; }
+  .tabs { display:flex; gap:0; border-bottom:2px solid #ddd; margin-bottom:14px; flex-wrap:wrap; }
+  .tab { padding:10px 16px; cursor:pointer; border-bottom:3px solid transparent; font-weight:600; color:#666; }
+  .tab.active { color:#1A3F8F; border-bottom-color:#1A3F8F; }
+  .panel { display:none; }
+  .panel.active { display:block; }
+  .card { background:#fff; border-radius:10px; padding:18px 22px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:14px; }
+  label { display:block; margin:10px 0 4px; font-weight:600; font-size:.85rem; color:#1A2035; }
+  input, select, textarea { padding:7px 10px; border:1px solid #cdd5e0; border-radius:6px; font-size:.9rem; width:100%; box-sizing:border-box; }
+  textarea { font-family:inherit; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  button { background:#1A3F8F; color:#fff; border:0; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:.88rem; }
+  button.secondary { background:#fff; color:#1A3F8F; border:1px solid #1A3F8F; }
+  button.danger { background:#a02020; }
+  button.warn { background:#7a4500; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  th, td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; vertical-align:top; }
+  th { background:#f7f9fc; color:#666; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.74rem; font-weight:600; }
+  .pill.queued, .pill.pending  { background:#fef0d8; color:#7a4500; }
+  .pill.running { background:#d8e6fe; color:#1A3F8F; }
+  .pill.done, .pill.approved   { background:#d8f0e2; color:#0a5c2c; }
+  .pill.failed, .pill.rejected { background:#f8d7d7; color:#a02020; }
+  .pill.merged { background:#dde3ee; color:#1A3F8F; }
+  .pill.needs_verification { background:#fde6c8; color:#7a4500; }
+  .muted { color:#666; font-size:.85rem; }
+  details summary { cursor:pointer; color:#1A3F8F; }
+  code { font-family:monospace; background:#f0f4f8; padding:1px 5px; border-radius:3px; font-size:.78rem; }
+</style>
+</head>
+<body>
+<header>
+  <div>HuaHinExpats — <strong>Source Enrichment</strong></div>
+  <div><a href="/admin.html">← Admin Home</a></div>
+</header>
+
+<main>
+  <div id="auth" class="card" style="display:none">
+    <h2>Sign in</h2>
+    <input type="password" id="pw" placeholder="Admin password" />
+    <button onclick="signIn()">Sign in</button>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="tabs">
+      <div class="tab active" data-panel="settings">Source Settings</div>
+      <div class="tab" data-panel="jobs">Discovery Jobs</div>
+      <div class="tab" data-panel="candidates">Candidate Review</div>
+      <div class="tab" data-panel="conflicts">Conflict Review</div>
+      <div class="tab" data-panel="logs">Import Logs</div>
+      <div class="tab" data-panel="quota">Quota / Cost</div>
+    </div>
+
+    <!-- Settings -->
+    <div class="panel active" id="panel-settings">
+      <div class="card">
+        <h2>Google Places + Enrichment Settings</h2>
+        <label>Google Places API key</label>
+        <input id="gp-key" type="password" autocomplete="new-password" placeholder="hidden — leave unchanged to keep" />
+        <div class="row">
+          <div><label>Daily request cap</label><input id="daily-cap" type="number" min="1" /></div>
+          <div><label>Per-run request cap</label><input id="run-cap" type="number" min="1" /></div>
+        </div>
+        <div class="row">
+          <div><label>Confidence threshold</label><input id="conf" type="number" step="0.05" min="0" max="1" /></div>
+          <div><label>User-agent (website fetcher)</label><input id="ua" /></div>
+        </div>
+        <label>Allowed categories (comma-separated slugs)</label>
+        <input id="allowed-cats" />
+        <label>Excluded categories</label>
+        <input id="excluded-cats" />
+        <h3>Hua Hin geo boundary</h3>
+        <div class="row">
+          <div><label>Center lat</label><input id="b-lat" type="number" step="0.0001" /></div>
+          <div><label>Center lng</label><input id="b-lng" type="number" step="0.0001" /></div>
+        </div>
+        <div class="row">
+          <div><label>Radius (m)</label><input id="b-radius" type="number" /></div>
+          <div><label>Auto-create candidates</label>
+            <select id="auto-create"><option value="true">Yes</option><option value="false">No</option></select>
+          </div>
+        </div>
+        <p class="muted"><strong>Auto-publish is always OFF.</strong> Every candidate requires operator approval before promotion to a listing, and promoted listings start in pending status for Editorial Review.</p>
+        <div style="margin-top:14px">
+          <button onclick="saveSettings()">Save</button>
+          <span id="settings-status" class="muted" style="margin-left:10px"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jobs -->
+    <div class="panel" id="panel-jobs">
+      <div class="card">
+        <h3>New discovery job</h3>
+        <div class="row">
+          <div><label>Job name</label><input id="job-name" placeholder="Restaurants in Hua Hin" /></div>
+          <div><label>Search query</label><input id="job-query" placeholder="restaurants in Hua Hin Thailand" /></div>
+        </div>
+        <div class="row">
+          <div><label>Target category (directory slug)</label>
+            <select id="job-cat">
+              <option value="restaurants">restaurants</option>
+              <option value="laundry">laundry</option>
+              <option value="massage">massage</option>
+              <option value="pet-services">pet-services</option>
+              <option value="handyman">handyman</option>
+              <option value="car-rental">car-rental</option>
+              <option value="medical-dental">medical-dental</option>
+              <option value="visa-legal">visa-legal</option>
+            </select>
+          </div>
+          <div><label>Max results</label><input id="job-max" type="number" value="60" min="1" max="200" /></div>
+        </div>
+        <button onclick="createJob()">Create job</button>
+      </div>
+      <div class="card">
+        <h3>Jobs</h3>
+        <table><thead><tr>
+          <th>#</th><th>Name</th><th>Query</th><th>Category</th><th>Status</th>
+          <th>Found</th><th>Created</th><th>Dupes</th><th>Errors</th><th>Actions</th>
+        </tr></thead><tbody id="jobs-rows"><tr><td colspan="10">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- Candidates -->
+    <div class="panel" id="panel-candidates">
+      <div class="card">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <label style="margin:0">Status:</label>
+          <select id="cand-status">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="merged">Merged</option>
+            <option value="needs_verification">Needs Verification</option>
+            <option value="">All</option>
+          </select>
+          <label style="margin:0">Has duplicate:</label>
+          <select id="cand-dup"><option value="">Any</option><option value="true">Yes</option><option value="false">No</option></select>
+          <button class="secondary" onclick="loadCandidates()">Refresh</button>
+        </div>
+        <table><thead><tr>
+          <th>#</th><th>Name</th><th>Category</th><th>Phone</th><th>Website</th>
+          <th>DQ</th><th>Dup?</th><th>Status</th><th>Actions</th>
+        </tr></thead><tbody id="cand-rows"><tr><td colspan="9">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- Conflicts -->
+    <div class="panel" id="panel-conflicts">
+      <div class="card">
+        <h3>Pending conflicts</h3>
+        <p class="muted">Operator chooses how to resolve each conflict. No data is overwritten automatically.</p>
+        <table><thead><tr>
+          <th>#</th><th>Candidate</th><th>Listing</th><th>Field</th><th>Existing</th><th>New</th><th>Source</th><th>Resolve</th>
+        </tr></thead><tbody id="conflict-rows"><tr><td colspan="8">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- Logs -->
+    <div class="panel" id="panel-logs">
+      <div class="card">
+        <h3>Import logs</h3>
+        <table><thead><tr><th>When</th><th>Job</th><th>Cand</th><th>Level</th><th>Message</th><th>Details</th></tr></thead>
+          <tbody id="log-rows"><tr><td colspan="6">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- Quota -->
+    <div class="panel" id="panel-quota">
+      <div class="card">
+        <h3>API usage</h3>
+        <table><thead><tr><th>Provider</th><th>Today</th><th>Last 7 days</th><th>Total</th></tr></thead>
+          <tbody id="quota-rows"><tr><td colspan="4">Loading…</td></tr></tbody></table>
+        <p class="muted">Each request to Google Places counts as one unit. The daily cap is enforced per UTC date.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let token = sessionStorage.getItem('adminToken') || '';
+function authed() { return { 'Content-Type':'application/json', 'x-admin-token': token }; }
+
+async function signIn() {
+  const pw = document.getElementById('pw').value;
+  const r = await fetch('/api/admin/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw })});
+  const data = await r.json();
+  if (r.ok) { token = data.token; sessionStorage.setItem('adminToken', token); show(); }
+}
+
+async function show() {
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.panel)));
+  await loadSettings();
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.panel === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  if (name === 'jobs') loadJobs();
+  if (name === 'candidates') loadCandidates();
+  if (name === 'conflicts') loadConflicts();
+  if (name === 'logs') loadLogs();
+  if (name === 'quota') loadQuota();
+}
+
+function esc(s) { return s == null ? '' : String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function loadSettings() {
+  const r = await fetch('/api/admin/enrichment/settings', { headers: authed() });
+  if (r.status === 401) { document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='block'; return; }
+  const cfg = await r.json();
+  document.getElementById('gp-key').placeholder = cfg.google_places_api_key ? `Stored: ${cfg.google_places_api_key}` : 'not set';
+  document.getElementById('daily-cap').value = cfg.daily_request_cap;
+  document.getElementById('run-cap').value = cfg.per_run_request_cap;
+  document.getElementById('conf').value = cfg.confidence_threshold;
+  document.getElementById('ua').value = cfg.user_agent || '';
+  document.getElementById('allowed-cats').value = (cfg.allowed_categories || []).join(', ');
+  document.getElementById('excluded-cats').value = (cfg.excluded_categories || []).join(', ');
+  document.getElementById('b-lat').value = cfg.geo_boundary?.center_lat;
+  document.getElementById('b-lng').value = cfg.geo_boundary?.center_lng;
+  document.getElementById('b-radius').value = cfg.geo_boundary?.radius_meters;
+  document.getElementById('auto-create').value = String(!!cfg.auto_create_candidates);
+}
+
+async function saveSettings() {
+  const body = {
+    daily_request_cap: parseInt(document.getElementById('daily-cap').value, 10),
+    per_run_request_cap: parseInt(document.getElementById('run-cap').value, 10),
+    confidence_threshold: parseFloat(document.getElementById('conf').value),
+    user_agent: document.getElementById('ua').value.trim(),
+    allowed_categories: document.getElementById('allowed-cats').value.split(',').map(s=>s.trim()).filter(Boolean),
+    excluded_categories: document.getElementById('excluded-cats').value.split(',').map(s=>s.trim()).filter(Boolean),
+    geo_boundary: {
+      center_lat: parseFloat(document.getElementById('b-lat').value),
+      center_lng: parseFloat(document.getElementById('b-lng').value),
+      radius_meters: parseInt(document.getElementById('b-radius').value, 10),
+    },
+    auto_create_candidates: document.getElementById('auto-create').value === 'true',
+    auto_publish: false,
+  };
+  const apiKey = document.getElementById('gp-key').value;
+  if (apiKey && !apiKey.includes('…')) body.google_places_api_key = apiKey;
+  const r = await fetch('/api/admin/enrichment/settings', { method:'PUT', headers: authed(), body: JSON.stringify(body) });
+  const status = document.getElementById('settings-status');
+  if (r.ok) { status.textContent='Saved.'; document.getElementById('gp-key').value=''; await loadSettings(); }
+  else { const e = await r.json(); status.textContent = 'Error: ' + (e.error||r.status); }
+}
+
+async function createJob() {
+  const body = {
+    name: document.getElementById('job-name').value.trim(),
+    search_query: document.getElementById('job-query').value.trim(),
+    category_target: document.getElementById('job-cat').value,
+    max_results: parseInt(document.getElementById('job-max').value, 10) || 60,
+  };
+  if (!body.name || !body.search_query) { alert('Name and query are required'); return; }
+  const r = await fetch('/api/admin/discovery-jobs', { method:'POST', headers: authed(), body: JSON.stringify(body) });
+  if (!r.ok) { alert('Create failed'); return; }
+  await loadJobs();
+}
+
+async function loadJobs() {
+  const r = await fetch('/api/admin/discovery-jobs', { headers: authed() });
+  const rows = await r.json();
+  if (!Array.isArray(rows) || !rows.length) { document.getElementById('jobs-rows').innerHTML='<tr><td colspan="10">No jobs yet.</td></tr>'; return; }
+  document.getElementById('jobs-rows').innerHTML = rows.map(j => `
+    <tr>
+      <td>${j.id}</td><td>${esc(j.name)}</td><td>${esc(j.search_query)}</td><td>${esc(j.category_target||'')}</td>
+      <td><span class="pill ${j.status}">${j.status}</span></td>
+      <td>${j.total_found}</td><td>${j.candidates_created}</td><td>${j.duplicates_found}</td><td>${j.errors}</td>
+      <td>${j.status === 'queued' || j.status === 'failed' ? `<button onclick="runJob(${j.id})">Run</button>` : ''}
+          <button class="secondary" onclick="viewJob(${j.id})">Details</button></td>
+    </tr>
+  `).join('');
+}
+
+async function runJob(id) {
+  if (!confirm('Run job ' + id + ' against Google Places? This consumes quota.')) return;
+  const r = await fetch(`/api/admin/discovery-jobs/${id}/run`, { method:'POST', headers: authed() });
+  if (r.ok) { alert('Queued. Refresh in a few seconds.'); await loadJobs(); }
+  else alert('Failed.');
+}
+
+async function viewJob(id) {
+  const r = await fetch(`/api/admin/discovery-jobs/${id}`, { headers: authed() });
+  const d = await r.json();
+  alert(`Job ${d.id} (${d.status})\nFound: ${d.total_found}, Created: ${d.candidates_created}, Dupes: ${d.duplicates_found}\nLogs:\n` +
+    (d.logs||[]).slice(0,15).map(l=>`[${l.level}] ${l.message}`).join('\n'));
+}
+
+async function loadCandidates() {
+  const status = document.getElementById('cand-status').value;
+  const dup = document.getElementById('cand-dup').value;
+  const qs = new URLSearchParams();
+  if (status) qs.set('status', status);
+  if (dup) qs.set('has_duplicate', dup);
+  const r = await fetch('/api/admin/candidates?' + qs.toString(), { headers: authed() });
+  const rows = await r.json();
+  if (!Array.isArray(rows) || !rows.length) { document.getElementById('cand-rows').innerHTML='<tr><td colspan="9">No candidates.</td></tr>'; return; }
+  document.getElementById('cand-rows').innerHTML = rows.map(c => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${esc(c.business_name)}<br><small class="muted">${esc(c.source)}/${esc(c.source_place_id||'')}</small></td>
+      <td>${esc(c.mapped_directory_category||'')}</td>
+      <td>${esc(c.phone||'')}</td>
+      <td>${c.website_url ? `<a target="_blank" rel="noopener" href="${esc(c.website_url)}">site</a>` : ''}</td>
+      <td>${c.dq_score ?? ''}</td>
+      <td>${c.duplicate_match_listing_id ? `<code>${esc(c.duplicate_match_listing_id)}</code>` : '—'}</td>
+      <td><span class="pill ${c.approval_status}">${c.approval_status}</span></td>
+      <td>
+        <button onclick="candAction(${c.id},'approve')">Approve</button>
+        <button class="warn" onclick="candAction(${c.id},'needs-verification')">Verify</button>
+        <button class="danger" onclick="candAction(${c.id},'reject')">Reject</button>
+        ${c.approval_status === 'approved' && !c.duplicate_match_listing_id ? `<button class="secondary" onclick="promote(${c.id})">Promote</button>` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function candAction(id, action) {
+  await fetch(`/api/admin/candidates/${id}/${action}`, { method:'POST', headers: authed() });
+  await loadCandidates();
+}
+
+async function promote(id) {
+  if (!confirm('Promote candidate ' + id + ' to a listing? It will be created in pending state for editorial review.')) return;
+  const r = await fetch(`/api/admin/candidates/${id}/promote`, { method:'POST', headers: authed() });
+  const d = await r.json();
+  alert(r.ok ? 'Created listing: ' + d.listing_id : 'Failed: ' + (d.error||r.status));
+  await loadCandidates();
+}
+
+async function loadConflicts() {
+  const r = await fetch('/api/admin/conflicts', { headers: authed() });
+  const rows = await r.json();
+  if (!Array.isArray(rows) || !rows.length) { document.getElementById('conflict-rows').innerHTML='<tr><td colspan="8">No pending conflicts.</td></tr>'; return; }
+  document.getElementById('conflict-rows').innerHTML = rows.map(c => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${esc(c.business_name)} <small class="muted">#${c.candidate_id}</small></td>
+      <td><code>${esc(c.listing_id||'')}</code></td>
+      <td>${esc(c.field_name)}</td>
+      <td>${esc(c.existing_value||'')}</td>
+      <td>${esc(c.new_value||'')}</td>
+      <td>${esc(c.source||'')}</td>
+      <td>
+        <select id="res-${c.id}">
+          <option value="keep_existing">Keep existing</option>
+          <option value="accept_new">Accept new</option>
+          <option value="store_as_alternate">Store as alternate</option>
+          <option value="ignore_source">Ignore source</option>
+          <option value="flag_owner_verification">Flag for owner verification</option>
+        </select>
+        <button onclick="resolveConflict(${c.id})">Resolve</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function resolveConflict(id) {
+  const res = document.getElementById('res-' + id).value;
+  const r = await fetch(`/api/admin/conflicts/${id}/resolve`, { method:'POST', headers: authed(), body: JSON.stringify({ resolution: res })});
+  if (r.ok) await loadConflicts(); else alert('Resolve failed');
+}
+
+async function loadLogs() {
+  const r = await fetch('/api/admin/enrichment/logs', { headers: authed() });
+  const rows = await r.json();
+  if (!Array.isArray(rows) || !rows.length) { document.getElementById('log-rows').innerHTML='<tr><td colspan="6">No logs.</td></tr>'; return; }
+  document.getElementById('log-rows').innerHTML = rows.map(l => `
+    <tr>
+      <td>${new Date(l.created_at).toLocaleString()}</td>
+      <td>${l.job_id ?? ''}</td><td>${l.candidate_id ?? ''}</td>
+      <td>${esc(l.level)}</td>
+      <td>${esc(l.message)}</td>
+      <td><details><summary>show</summary><pre style="white-space:pre-wrap;font-size:.78rem">${esc(JSON.stringify(l.details,null,2))}</pre></details></td>
+    </tr>
+  `).join('');
+}
+
+async function loadQuota() {
+  const r = await fetch('/api/admin/enrichment/quota', { headers: authed() });
+  const rows = await r.json();
+  if (!Array.isArray(rows) || !rows.length) { document.getElementById('quota-rows').innerHTML='<tr><td colspan="4">No API usage recorded.</td></tr>'; return; }
+  document.getElementById('quota-rows').innerHTML = rows.map(q =>
+    `<tr><td>${esc(q.provider)}</td><td>${q.today}</td><td>${q.last_7d}</td><td>${q.total}</td></tr>`
+  ).join('');
+}
+
+if (token) show(); else document.getElementById('auth').style.display='block';
+</script>
+</body>
+</html>

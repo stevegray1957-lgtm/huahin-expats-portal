@@ -5,14 +5,25 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const db = require('./database');
+const paymentsRoutes = require('./src/payments/routes');
+const enrichmentRoutes = require('./src/enrichment/routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'change-me';
 
+// Webhook endpoint must read the raw body for HMAC signature verification.
+// Mount it BEFORE express.json() so we capture bytes verbatim.
+app.post(
+  '/api/webhooks/airwallex',
+  express.raw({ type: '*/*', limit: '1mb' }),
+  (req, res, next) => { req.rawBody = req.body?.toString('utf8') || ''; next(); },
+  (req, res) => paymentsRoutes.handleAirwallexWebhook(req, res)
+);
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(express.json());
+app.use(express.json({ limit: '256kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 function getIp(req) {
@@ -192,6 +203,11 @@ app.post('/api/admin/edits/resolve/:id', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: 'Server error' }); }
 });
+
+// ─── Payments + Enrichment routes ─────────────────────────────────────────────
+
+paymentsRoutes.attach(app, { requireAdmin });
+enrichmentRoutes.attach(app, { requireAdmin });
 
 // ─── 404 fallback ─────────────────────────────────────────────────────────────
 

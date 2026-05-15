@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Upgrade your listing | HuaHinExpatsPortal</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { background:#F0F4F8; font-family:system-ui,sans-serif; }
+  .wrap { max-width:680px; margin:32px auto; padding:0 16px; }
+  .card { background:#fff; border-radius:12px; padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  h1 { margin:0 0 8px; color:#1A2035; }
+  .tier { border:2px solid #dde3ee; border-radius:10px; padding:14px 16px; margin:10px 0; cursor:pointer; }
+  .tier.selected { border-color:#1A3F8F; background:#f5f8ff; }
+  .tier-head { display:flex; justify-content:space-between; align-items:baseline; }
+  .tier-head strong { font-size:1.05rem; }
+  .tier-price { font-weight:700; color:#1A3F8F; }
+  label { display:block; margin:14px 0 4px; font-weight:600; font-size:.88rem; }
+  input { width:100%; padding:9px 12px; border:1px solid #cdd5e0; border-radius:6px; box-sizing:border-box; font-size:.95rem; }
+  button { background:#1A3F8F; color:#fff; border:0; padding:12px 22px; border-radius:8px; cursor:pointer; font-weight:700; font-size:1rem; }
+  button:disabled { opacity:.5; cursor:wait; }
+  .err { color:#cc1a1a; }
+  .muted { color:#666; font-size:.88rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Upgrade your listing</h1>
+    <p class="muted" id="listing-info">Loading listing…</p>
+    <div id="tiers"></div>
+    <label>Your email (for receipt)</label>
+    <input type="email" id="email" placeholder="you@example.com" />
+    <p class="err" id="err" style="display:none"></p>
+    <button id="go" onclick="go()" disabled>Continue to payment →</button>
+    <p class="muted" style="margin-top:18px">You'll be redirected to Airwallex's hosted checkout. Your listing is upgraded automatically once payment is confirmed.</p>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const listingId = params.get('listing_id') || '';
+let selectedTier = null;
+
+async function load() {
+  if (!listingId) { document.getElementById('err').textContent = 'Missing listing_id'; document.getElementById('err').style.display='block'; return; }
+  try {
+    const [listing, tiers] = await Promise.all([
+      fetch('/api/listings/' + encodeURIComponent(listingId)).then(r => r.ok ? r.json() : null),
+      fetch('/api/payments/tiers').then(r => r.ok ? r.json() : null),
+    ]);
+    if (!listing) { document.getElementById('err').textContent = 'Listing not found'; document.getElementById('err').style.display='block'; return; }
+    document.getElementById('listing-info').textContent = `${listing.name} — ${listing.category}`;
+    if (!tiers?.enabled) { document.getElementById('err').textContent = 'Upgrades are not currently available.'; document.getElementById('err').style.display='block'; return; }
+    renderTiers(tiers.tiers);
+    document.getElementById('go').disabled = false;
+  } catch (e) {
+    document.getElementById('err').textContent = 'Failed to load: ' + e.message;
+    document.getElementById('err').style.display='block';
+  }
+}
+
+function renderTiers(tiers) {
+  const wrap = document.getElementById('tiers');
+  wrap.innerHTML = '';
+  for (const [k, t] of Object.entries(tiers)) {
+    const div = document.createElement('div');
+    div.className = 'tier';
+    div.dataset.key = k;
+    div.innerHTML = `<div class="tier-head"><strong>${esc(t.label || k)}</strong>
+      <span class="tier-price">${t.amount} ${esc(t.currency)}</span></div>
+      <div class="muted">${esc(t.duration_days)} days</div>`;
+    div.onclick = () => {
+      document.querySelectorAll('.tier').forEach(el => el.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedTier = k;
+    };
+    wrap.appendChild(div);
+  }
+}
+
+function esc(s) { return s == null ? '' : String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function go() {
+  if (!selectedTier) { document.getElementById('err').textContent = 'Choose a tier first.'; document.getElementById('err').style.display='block'; return; }
+  const email = document.getElementById('email').value.trim();
+  document.getElementById('go').disabled = true;
+  document.getElementById('err').style.display = 'none';
+  const r = await fetch('/api/payments/checkout', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ listing_id: listingId, tier: selectedTier, owner_email: email || undefined }),
+  });
+  const d = await r.json();
+  if (r.ok && d.hosted_url) {
+    location.href = d.hosted_url;
+  } else {
+    document.getElementById('err').textContent = d.error || 'Checkout failed.';
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('go').disabled = false;
+  }
+}
+
+load();
+</script>
+</body>
+</html>
